@@ -4,11 +4,11 @@
   "private": "true",
   "main": "app.js",
   "dependencies": {
+    "lodash": "~2.4.1"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.js"
   },
   "author": "ribot",
   "contributors": [
