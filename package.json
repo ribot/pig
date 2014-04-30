@@ -1,0 +1,23 @@
+{
+  "name": "jsbridge",
+  "version": "0.0.1",
+  "private": "true",
+  "main": "app.js",
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "scripts": {
+    "start": "node app.js",
+  },
+  "author": "ribot",
+  "contributors": [
+    {
+      "name": "Matt Oakes",
+      "email": "matt@ribot.co.uk"
+    }
+  ],
+  "engines": {
+    "node": "0.10.x"
+  }
+}
