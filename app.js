@@ -1,5 +1,4 @@
-var async = require( 'async' ),
-    bridge = require( './lib/bridge' );
+var bridge = require( './lib/bridge' );
 
 bridge.register( 'message', function( data, res ) {
   res.send( 'Hello World!' );
