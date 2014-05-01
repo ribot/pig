@@ -5,9 +5,6 @@ bridge.register( 'message', function( data, res ) {
   res.send( 'Hello World!' );
 } );
 
-async.times( 2000, function( n, done ) {
-  bridge.send( 'message', {}, done );
-}, function( err, results ) {
-  console.log( err );
-  console.log( results.length );
-} );
+for ( var i = 0; i < 2000; i++ ) {
+  bridge.send( i, 'message', {} );
+}
