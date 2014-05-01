@@ -6,5 +6,5 @@ bridge.register( 'message', function( data, res ) {
 } );
 
 for ( var i = 0; i < 2000; i++ ) {
-  bridge.send( i, 'message', {} );
+  bridge.send( i, 'message', "{}" );
 }
