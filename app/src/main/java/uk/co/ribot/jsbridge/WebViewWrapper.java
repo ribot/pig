@@ -3,6 +3,7 @@ package uk.co.ribot.jsbridge;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -59,6 +60,9 @@ public class WebViewWrapper {
             }
         });
 
+        // Add the JS->Native interface
+        mWebView.addJavascriptInterface(new JsToNativeInterface(), "android");
+
         // Load the bridge webpage
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
@@ -69,6 +73,17 @@ public class WebViewWrapper {
             mWebView.loadUrl("javascript:" + js);
         } else {
             mStatementQueue.offer(js);
+        }
+    }
+
+    private class JsToNativeInterface {
+        public JsToNativeInterface() {
+        }
+
+        @JavascriptInterface
+        public void reply(String error, String response) {
+            Log.d(TAG, "Error: " + error);
+            Log.d(TAG, "Response: " + response);
         }
     }
 }

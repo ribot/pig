@@ -1,5 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-window.bridge = require( './lib/bridge' );
+var bridge = window.bridge = require( './lib/bridge' );
+
+bridge.register( 'message', function( data, res ) {
+  res.send( 'Hello World!' );
+} );
 
 },{"./lib/bridge":2}],2:[function(require,module,exports){
 var _ = require( 'lodash' ),
@@ -14,19 +18,14 @@ var register = function register( path, handler ) {
   } );
 };
 
-var send = function send( path, data, callback ) {
-  if ( typeof data === 'function' ) {
-    callback = data;
-    data = null;
-  }
-
+var send = function send( path, data ) {
+  var res = new Response();
   var pathHandler = _.find( paths, {path: path} );
 
   if ( !pathHandler ) {
-    return callback( 'No handler defined for path: ' + path );
+    return res.error( 'No handler defined for path: ' + path );
   }
 
-  var res = new Response( callback );
   pathHandler.handler( data, res );
 };
 
@@ -34,13 +33,13 @@ module.exports.register = register;
 module.exports.send = send;
 
 },{"./response":3,"lodash":4}],3:[function(require,module,exports){
-module.exports = function Response( callback ) {
+module.exports = function Response() {
   this.error = function error( error ) {
-    callback( error );
+    window.android.reply( error );
   };
 
   this.send = function send( response ) {
-    callback( null, response );
+    window.android.reply( null, response );
   };
 };
 
