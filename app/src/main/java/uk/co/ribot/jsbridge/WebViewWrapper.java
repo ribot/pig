@@ -3,11 +3,14 @@ package uk.co.ribot.jsbridge;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -16,8 +19,10 @@ public class WebViewWrapper {
 
     private final Context mContext;
     private final WebView mWebView;
-    private final Queue<String> mStatementQueue = new ConcurrentLinkedQueue<>();
     private boolean mIsReady;
+
+    private final Queue<Pair<String, Callback>> mStatementQueue = new ConcurrentLinkedQueue<>();
+    private final Map<Double, Callback> callbackMap = new HashMap<>();
 
     public WebViewWrapper(Context context) {
         mContext = context;
@@ -35,7 +40,6 @@ public class WebViewWrapper {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public void onLoadResource(WebView view, String url) {
-                Log.d(TAG, "Requested: " + url);
                 super.onLoadResource(view, url);
             }
 
@@ -49,12 +53,10 @@ public class WebViewWrapper {
                 if (mIsReady) return;
                 super.onPageFinished(view, url);
 
-                Log.d(TAG, "Finished: " + url);
                 mIsReady = true;
 
-                for (String stmt : mStatementQueue) {
-                    Log.d(TAG, "Queued request: " + stmt);
-                    js(stmt);
+                for (Pair<String, Callback> statement : mStatementQueue) {
+                    js(statement.first, statement.second);
                 }
                 mStatementQueue.clear();
             }
@@ -68,22 +70,35 @@ public class WebViewWrapper {
     }
 
 
-    public void js(String js) {
+    public void js(String path, Callback callback) {
         if (mIsReady) {
-            mWebView.loadUrl("javascript:" + js);
+            double randomKey;
+            do {
+                randomKey = Math.round(Math.random() * 40000);
+            } while (callbackMap.containsKey(randomKey));
+
+            callbackMap.put(randomKey, callback);
+            mWebView.loadUrl("javascript:window.bridge.send(" + randomKey + ", \"" + path + "\")");
         } else {
-            mStatementQueue.offer(js);
+            mStatementQueue.offer(Pair.create(path, callback));
         }
     }
 
     private class JsToNativeInterface {
-        public JsToNativeInterface() {
-        }
-
         @JavascriptInterface
-        public void reply(String error, String response) {
-            Log.d(TAG, "Error: " + error);
-            Log.d(TAG, "Response: " + response);
+        public void reply(String key, String error, String response) {
+            Double doubleKey = Double.parseDouble(key);
+
+            Callback callback = callbackMap.get(doubleKey);
+            if (callback != null) {
+                callback.callback(error, response);
+            } else {
+                Log.w(TAG, "No callback for key: " + doubleKey);
+            }
         }
+    }
+
+    public interface Callback {
+        void callback(String error, String response);
     }
 }

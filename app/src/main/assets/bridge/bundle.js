@@ -5,6 +5,10 @@ bridge.register( 'message', function( data, res ) {
   res.send( 'Hello World!' );
 } );
 
+bridge.register( 'message2', function( data, res ) {
+  res.send( 'Hello again!' );
+} );
+
 },{"./lib/bridge":2}],2:[function(require,module,exports){
 var _ = require( 'lodash' ),
     Response = require( './response' );
@@ -18,8 +22,8 @@ var register = function register( path, handler ) {
   } );
 };
 
-var send = function send( path, data ) {
-  var res = new Response();
+var send = function send( key, path, data ) {
+  var res = new Response( key );
   var pathHandler = _.find( paths, {path: path} );
 
   if ( !pathHandler ) {
@@ -33,13 +37,21 @@ module.exports.register = register;
 module.exports.send = send;
 
 },{"./response":3,"lodash":4}],3:[function(require,module,exports){
-module.exports = function Response() {
+module.exports = function Response( key ) {
   this.error = function error( error ) {
-    window.android.reply( error );
+    if ( window.android ) {
+      window.android.reply( key, error );
+    } else {
+      console.log( 'Error %d: %s', key, error );
+    }
   };
 
   this.send = function send( response ) {
-    window.android.reply( null, response );
+    if ( window.android ) {
+      window.android.reply( key, null, response );
+    } else {
+      console.log( 'Send %d: %s', key, error );
+    }
   };
 };
 

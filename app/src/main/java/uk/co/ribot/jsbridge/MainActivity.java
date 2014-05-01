@@ -2,6 +2,7 @@ package uk.co.ribot.jsbridge;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
@@ -11,6 +12,20 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         WebViewWrapper webViewWrapper = ((Application) getApplication()).getWebViewWrapper();
-        webViewWrapper.js("window.bridge.send(\"message\")");
+        webViewWrapper.js("message", new WebViewWrapper.Callback() {
+            @Override
+            public void callback(String error, String response) {
+                Log.d("MainActivity", "Error: " + error);
+                Log.d("MainActivity", "Message: " + response);
+            }
+        });
+
+        webViewWrapper.js("message2", new WebViewWrapper.Callback() {
+            @Override
+            public void callback(String error, String response) {
+                Log.d("MainActivity", "Error: " + error);
+                Log.d("MainActivity", "Message 2: " + response);
+            }
+        });
     }
 }
