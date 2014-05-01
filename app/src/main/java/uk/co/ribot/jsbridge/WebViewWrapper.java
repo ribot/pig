@@ -3,9 +3,7 @@ package uk.co.ribot.jsbridge;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.*;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -58,6 +56,9 @@ public class WebViewWrapper {
                 mStatementQueue.clear();
             }
         });
+
+        // Set the web view chrome client to see console messages
+        mWebView.setWebChromeClient(new WebChromeClient());
 
         // Add the JS->Native interface
         mWebView.addJavascriptInterface(new JsToNativeInterface(), "android");

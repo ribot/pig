@@ -31,14 +31,14 @@ var send = function send( key, path, data ) {
   var res = new Response( key );
 
   path = unescape(path);
-  if (data) {
+  if (data && data.trim() !== "") {
     data = unescape(data);
-  }
 
-  try {
-    data = JSON.parse(data);
-  } catch (e) {
-    return res.error( 'JSON parse error: ' + e );
+    try {
+      data = JSON.parse(data);
+    } catch (e) {
+      return res.error( 'JSON parse error: ' + e );
+    }
   }
 
   var pathHandler = _.find( paths, {path: path} );
@@ -57,7 +57,7 @@ module.exports.send = send;
 module.exports = function Response( key ) {
   this.error = function error( error ) {
     if ( typeof window != "undefined" && window.android ) {
-      window.android.reply( key, error );
+      window.android.reply( key, error, null );
     } else {
       console.log( 'Error %d: %s', key, error );
     }
