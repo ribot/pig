@@ -9,6 +9,11 @@ bridge.register( 'message2', function( data, res ) {
   res.send( 'Hello again!' );
 } );
 
+bridge.register( 'data', function( data, res ) {
+  var result = data.first + data.second;
+  res.send( result );
+} );
+
 },{"./lib/bridge":2}],2:[function(require,module,exports){
 var _ = require( 'lodash' ),
     Response = require( './response' );
@@ -24,6 +29,18 @@ var register = function register( path, handler ) {
 
 var send = function send( key, path, data ) {
   var res = new Response( key );
+
+  path = unescape(path);
+  if (data) {
+    data = unescape(data);
+  }
+
+  try {
+    data = JSON.parse(data);
+  } catch (e) {
+    return res.error( 'JSON parse error: ' + e );
+  }
+
   var pathHandler = _.find( paths, {path: path} );
 
   if ( !pathHandler ) {
@@ -39,7 +56,7 @@ module.exports.send = send;
 },{"./response":3,"lodash":4}],3:[function(require,module,exports){
 module.exports = function Response( key ) {
   this.error = function error( error ) {
-    if ( window.android ) {
+    if ( typeof window != "undefined" && window.android ) {
       window.android.reply( key, error );
     } else {
       console.log( 'Error %d: %s', key, error );
@@ -47,10 +64,10 @@ module.exports = function Response( key ) {
   };
 
   this.send = function send( response ) {
-    if ( window.android ) {
+    if ( typeof window != "undefined" && window.android ) {
       window.android.reply( key, null, response );
     } else {
-      console.log( 'Send %d: %s', key, error );
+      console.log( 'Send %d: %s', key, response );
     }
   };
 };

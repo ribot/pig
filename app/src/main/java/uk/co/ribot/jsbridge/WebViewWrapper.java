@@ -3,7 +3,6 @@ package uk.co.ribot.jsbridge;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
-import android.util.Pair;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -17,15 +16,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class WebViewWrapper {
     private static final String TAG = "WebViewWrapper";
 
-    private final Context mContext;
     private final WebView mWebView;
     private boolean mIsReady;
 
-    private final Queue<Pair<String, Callback>> mStatementQueue = new ConcurrentLinkedQueue<>();
-    private final Map<Double, Callback> callbackMap = new HashMap<>();
+    private final Queue<QueueStatement> mStatementQueue = new ConcurrentLinkedQueue<>();
+    private final Map<Double, JSBridge.Callback> callbackMap = new HashMap<>();
 
     public WebViewWrapper(Context context) {
-        mContext = context;
         mWebView = new WebView(context);
 
         initWebView();
@@ -55,8 +52,8 @@ public class WebViewWrapper {
 
                 mIsReady = true;
 
-                for (Pair<String, Callback> statement : mStatementQueue) {
-                    js(statement.first, statement.second);
+                for (QueueStatement statement : mStatementQueue) {
+                    js(statement.getPath(), statement.getJsonData(), statement.getCallback());
                 }
                 mStatementQueue.clear();
             }
@@ -70,18 +67,24 @@ public class WebViewWrapper {
     }
 
 
-    public void js(String path, Callback callback) {
-        if (mIsReady) {
-            double randomKey;
-            do {
-                randomKey = Math.round(Math.random() * 40000);
-            } while (callbackMap.containsKey(randomKey));
-
-            callbackMap.put(randomKey, callback);
-            mWebView.loadUrl("javascript:window.bridge.send(" + randomKey + ", \"" + path + "\")");
-        } else {
-            mStatementQueue.offer(Pair.create(path, callback));
+    public void js(String path, String jsonData, JSBridge.Callback callback) {
+        if (!mIsReady) {
+            mStatementQueue.offer(new QueueStatement(path, jsonData, callback));
+            return;
         }
+
+        double randomKey;
+        do {
+            randomKey = Math.round(Math.random() * 40000);
+        } while (callbackMap.containsKey(randomKey));
+
+        jsonData = jsonData.replace("\"", "\\\"");
+
+        String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + path + "\", \"" + jsonData + "\")";
+        Log.d(TAG, "jsUrl: " + jsUrl);
+
+        callbackMap.put(randomKey, callback);
+        mWebView.loadUrl(jsUrl);
     }
 
     private class JsToNativeInterface {
@@ -89,7 +92,7 @@ public class WebViewWrapper {
         public void reply(String key, String error, String response) {
             Double doubleKey = Double.parseDouble(key);
 
-            Callback callback = callbackMap.get(doubleKey);
+            JSBridge.Callback callback = callbackMap.get(doubleKey);
             if (callback != null) {
                 callback.callback(error, response);
             } else {
@@ -98,7 +101,27 @@ public class WebViewWrapper {
         }
     }
 
-    public interface Callback {
-        void callback(String error, String response);
+    private class QueueStatement {
+        private String mPath;
+        private String mJsonData;
+        private JSBridge.Callback mCallback;
+
+        public QueueStatement(String path, String data, JSBridge.Callback callback) {
+            mPath = path;
+            mJsonData = data;
+            mCallback = callback;
+        }
+
+        public String getPath() {
+            return mPath;
+        }
+
+        public String getJsonData() {
+            return mJsonData;
+        }
+
+        public JSBridge.Callback getCallback() {
+            return mCallback;
+        }
     }
 }

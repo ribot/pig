@@ -13,8 +13,7 @@ public class MainActivity extends Activity {
     }
 
     public void buttonMessage1(View v) {
-        WebViewWrapper webViewWrapper = ((Application) getApplication()).getWebViewWrapper();
-        webViewWrapper.js("message", new WebViewWrapper.Callback() {
+        JSBridge.get(this).send("message", "", new JSBridge.Callback() {
             @Override
             public void callback(String error, String response) {
                 Log.d("MainActivity", "Error: " + error);
@@ -24,12 +23,21 @@ public class MainActivity extends Activity {
     }
 
     public void buttonMessage2(View v) {
-        WebViewWrapper webViewWrapper = ((Application) getApplication()).getWebViewWrapper();
-        webViewWrapper.js("message2", new WebViewWrapper.Callback() {
+        JSBridge.get(this).send("message2", "", new JSBridge.Callback() {
             @Override
             public void callback(String error, String response) {
                 Log.d("MainActivity", "Error: " + error);
                 Log.d("MainActivity", "Message 2: " + response);
+            }
+        });
+    }
+
+    public void buttonData(View v) {
+        JSBridge.get(this).send("data", "{\"first\": 2, \"second\": 2}", new JSBridge.Callback() {
+            @Override
+            public void callback(String error, String response) {
+                Log.d("MainActivity", "Error: " + error);
+                Log.d("MainActivity", "Data: " + response);
             }
         });
     }
