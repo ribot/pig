@@ -1,0 +1,17 @@
+# Local configuration file (sdk path, etc)
+local.properties
+project.properties.actual*
+
+# Ignore mac files
+.DS_Store
+app/.classpath
+app/.project
+app/AndroidManifest.xml-
+.metadata/
+
+doc/
+.idea/
+app/.idea/
+.gradle/
+*.iml
+build/
