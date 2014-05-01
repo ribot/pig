@@ -34,3 +34,7 @@ CVS
 
 # sass
 .sass-cache/
+
+# Project
+bundle.js
+index.html

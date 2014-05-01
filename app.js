@@ -1,14 +1,12 @@
 var async = require( 'async' ),
     bridge = require( './lib/bridge' );
 
-bridge.register( 'request', function( data, res ) {
-  setTimeout( function() {
-    res.send( 1 );
-  }, Math.random() * 1000 );
+bridge.register( 'message', function( data, res ) {
+  res.send( 'Hello World!' );
 } );
 
 async.times( 2000, function( n, done ) {
-  bridge.send( 'request', {}, done );
+  bridge.send( 'message', {}, done );
 }, function( err, results ) {
   console.log( err );
   console.log( results.length );
