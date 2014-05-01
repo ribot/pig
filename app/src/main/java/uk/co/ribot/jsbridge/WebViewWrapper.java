@@ -49,13 +49,13 @@ public class WebViewWrapper {
                 super.onPageFinished(view, url);
 
                 Log.d(TAG, "Finished: " + url);
+                mIsReady = true;
 
                 for (String stmt : mStatementQueue) {
-                    Log.d(TAG, stmt);
-                    mWebView.loadUrl("javascript:" + stmt);
+                    Log.d(TAG, "Queued request: " + stmt);
+                    js(stmt);
                 }
                 mStatementQueue.clear();
-                mIsReady = true;
             }
         });
 
