@@ -104,8 +104,6 @@ public class WebViewWrapper {
         final Class<R> responseClass = statement.getResponseClass();
 
         if (callback != null) {
-            Log.d(TAG, "Response class: " + responseClass);
-
             if (error != null) {
                 callback.callback(error, null);
             } else {
