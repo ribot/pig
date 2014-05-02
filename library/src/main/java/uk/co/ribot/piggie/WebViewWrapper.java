@@ -1,9 +1,14 @@
-package uk.co.ribot.jsbridge;
+package uk.co.ribot.piggie;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
-import android.webkit.*;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -15,13 +20,15 @@ public class WebViewWrapper {
     private static final String TAG = "WebViewWrapper";
 
     private final WebView mWebView;
+    private final Handler mMainHandler;
     private boolean mIsReady;
 
     private final Queue<QueueStatement> mStatementQueue = new ConcurrentLinkedQueue<QueueStatement>();
-    private final Map<Double, JSBridge.Callback> callbackMap = new HashMap<Double, JSBridge.Callback>();
+    private final Map<Double, Piggie.Callback> callbackMap = new HashMap<Double, Piggie.Callback>();
 
     public WebViewWrapper(Context context) {
         mWebView = new WebView(context);
+        mMainHandler = new Handler(Looper.getMainLooper());
 
         initWebView();
     }
@@ -67,7 +74,7 @@ public class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public void js(String path, String jsonData, JSBridge.Callback callback) {
+    public void js(String path, String jsonData, Piggie.Callback callback) {
         if (!mIsReady) {
             mStatementQueue.offer(new QueueStatement(path, jsonData, callback));
             return;
@@ -81,18 +88,23 @@ public class WebViewWrapper {
         jsonData = jsonData.replace("\"", "\\\"");
         callbackMap.put(randomKey, callback);
 
+        Log.d(TAG, "Key: " + randomKey);
         String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + path + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
     }
 
     private class JsToNativeInterface {
         @JavascriptInterface
-        public void reply(String key, String error, String response) {
+        public void reply(String key, final String error, final String response) {
             Double doubleKey = Double.parseDouble(key);
 
-            JSBridge.Callback callback = callbackMap.get(doubleKey);
+            final Piggie.Callback callback = callbackMap.get(doubleKey);
             if (callback != null) {
-                callback.callback(error, response);
+                mMainHandler.post(new Runnable() {
+                    public void run() {
+                        callback.callback(error, response);
+                    }
+                });
             } else {
                 Log.w(TAG, "No callback for key: " + doubleKey);
             }
@@ -102,9 +114,9 @@ public class WebViewWrapper {
     private class QueueStatement {
         private String mPath;
         private String mJsonData;
-        private JSBridge.Callback mCallback;
+        private Piggie.Callback mCallback;
 
-        public QueueStatement(String path, String data, JSBridge.Callback callback) {
+        public QueueStatement(String path, String data, Piggie.Callback callback) {
             mPath = path;
             mJsonData = data;
             mCallback = callback;
@@ -118,7 +130,7 @@ public class WebViewWrapper {
             return mJsonData;
         }
 
-        public JSBridge.Callback getCallback() {
+        public Piggie.Callback getCallback() {
             return mCallback;
         }
     }

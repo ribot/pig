@@ -1,20 +1,24 @@
-package uk.co.ribot.jsbridge;
+package uk.co.ribot.piggie;
 
 import android.content.Context;
 
-public class JSBridge {
-    private static JSBridge sJSBridge;
-    public static JSBridge get(Context context) {
-        if (sJSBridge == null) {
-            sJSBridge = new JSBridge(context);
+public class Piggie {
+    private static Piggie sPiggie;
+    public static Piggie get(Context context) {
+        if (sPiggie == null) {
+            sPiggie = new Piggie(context);
         }
-        return sJSBridge;
+        return sPiggie;
     }
 
     private WebViewWrapper mWebViewWrapper;
 
-    private JSBridge(Context context) {
+    private Piggie(Context context) {
         mWebViewWrapper = new WebViewWrapper(context);
+    }
+
+    public void send(String path, Callback callback) {
+        send(path, "", callback);
     }
 
     public void send(String path, String data, Callback callback) {
