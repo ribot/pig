@@ -67,7 +67,6 @@ public class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-
     public void js(String path, String jsonData, JSBridge.Callback callback) {
         if (!mIsReady) {
             mStatementQueue.offer(new QueueStatement(path, jsonData, callback));
