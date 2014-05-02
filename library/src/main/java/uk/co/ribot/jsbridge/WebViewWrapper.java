@@ -17,8 +17,8 @@ public class WebViewWrapper {
     private final WebView mWebView;
     private boolean mIsReady;
 
-    private final Queue<QueueStatement> mStatementQueue = new ConcurrentLinkedQueue<>();
-    private final Map<Double, JSBridge.Callback> callbackMap = new HashMap<>();
+    private final Queue<QueueStatement> mStatementQueue = new ConcurrentLinkedQueue<QueueStatement>();
+    private final Map<Double, JSBridge.Callback> callbackMap = new HashMap<Double, JSBridge.Callback>();
 
     public WebViewWrapper(Context context) {
         mWebView = new WebView(context);
