@@ -1,14 +1,11 @@
 package uk.co.ribot.piggie;
 
 import android.content.Context;
-import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class Piggie {
-    private static final String TAG = "Piggie";
-
     private static Piggie sPiggie;
     private final Gson mGson;
 
@@ -26,20 +23,20 @@ public class Piggie {
         mGson = new Gson();
     }
 
-    public void send(String path, Callback callback) {
-        send(path, null, callback);
+    public <R> void send(String path, Class<R> responseClass, Callback<R> callback) {
+        send(path, null, responseClass, callback);
     }
 
-    public void send(String path, Object data, Callback callback) {
+    public <R> void send(String path, Object data, Class<R> responseClass, Callback<R> callback) {
         Class dataClass = null;
         if (data != null) {
             dataClass = data.getClass();
         }
 
-        send(path, data, dataClass, callback);
+        send(path, dataClass, data, responseClass, callback);
     }
 
-    public void send(String path, Object data, Class dataClass, Callback callback) {
+    public <D, R> void send(String path, Class<D> dataClass, D data, Class<R> responseClass, Callback<R> callback) {
         String json = "";
         if (data != null) {
             if (data instanceof String && isAlreadyJson((String) data)) {
@@ -48,9 +45,8 @@ public class Piggie {
                 json = mGson.toJson(data, dataClass);
             }
         }
-        Log.d(TAG, "Json: " + json);
 
-        mWebViewWrapper.js(path, json, callback);
+        mWebViewWrapper.js(path, json, responseClass, callback);
     }
 
     private boolean isAlreadyJson(String string) {
@@ -62,7 +58,7 @@ public class Piggie {
         }
     }
 
-    public interface Callback {
-        void callback(String error, String response);
+    public interface Callback<R> {
+        void callback(String error, R response);
     }
 }

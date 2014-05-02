@@ -9,6 +9,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.google.gson.Gson;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -21,14 +22,16 @@ public class WebViewWrapper {
 
     private final WebView mWebView;
     private final Handler mMainHandler;
-    private boolean mIsReady;
+    private final Gson mGson;
 
-    private final Queue<QueueStatement> mStatementQueue = new ConcurrentLinkedQueue<QueueStatement>();
-    private final Map<Double, Piggie.Callback> callbackMap = new HashMap<Double, Piggie.Callback>();
+    private boolean mIsReady;
+    private final Queue<Statement> mPreStartStatementQueue = new ConcurrentLinkedQueue<Statement>();
+    private final Map<Double, Statement> mSentRequestStatementMap = new HashMap<Double, Statement>();
 
     public WebViewWrapper(Context context) {
         mWebView = new WebView(context);
         mMainHandler = new Handler(Looper.getMainLooper());
+        mGson = new Gson();
 
         initWebView();
     }
@@ -57,10 +60,10 @@ public class WebViewWrapper {
 
                 mIsReady = true;
 
-                for (QueueStatement statement : mStatementQueue) {
-                    js(statement.getPath(), statement.getJsonData(), statement.getCallback());
+                for (Statement statement : mPreStartStatementQueue) {
+                    js(statement);
                 }
-                mStatementQueue.clear();
+                mPreStartStatementQueue.clear();
             }
         });
 
@@ -74,50 +77,75 @@ public class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public void js(String path, String jsonData, Piggie.Callback callback) {
+    public <R> void js(String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
+        js(new Statement<R>(path, jsonData, responseClass, callback));
+    }
+
+    private <R> void js(Statement<R> statement) {
         if (!mIsReady) {
-            mStatementQueue.offer(new QueueStatement(path, jsonData, callback));
+            mPreStartStatementQueue.offer(statement);
             return;
         }
 
         double randomKey;
         do {
             randomKey = Math.round(Math.random() * 40000);
-        } while (callbackMap.containsKey(randomKey));
+        } while (mSentRequestStatementMap.containsKey(randomKey));
+        mSentRequestStatementMap.put(randomKey, statement);
 
-        jsonData = jsonData.replace("\"", "\\\"");
-        callbackMap.put(randomKey, callback);
-
-        String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + path + "\", \"" + jsonData + "\")";
+        String jsonData = statement.getJsonData().replace("\"", "\\\"");
+        String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
+    }
+
+    @SuppressWarnings("unchecked") // We are checking the generic type is String before string the String object
+    private <R> void respond(Double key, Statement<R> statement, String error, String responseString) {
+        final Piggie.Callback<R> callback = statement.getCallback();
+        final Class<R> responseClass = statement.getResponseClass();
+
+        if (callback != null) {
+            Log.d(TAG, "Response class: " + responseClass);
+
+            if (error != null) {
+                callback.callback(error, null);
+            } else {
+                R response;
+                if (responseClass == String.class) {
+                    response = (R) responseString;
+                } else {
+                    response = mGson.fromJson(responseString, responseClass);
+                }
+                callback.callback(null, response);
+            }
+        } else {
+            Log.w(TAG, "No callback for key: " + key);
+        }
     }
 
     private class JsToNativeInterface {
         @JavascriptInterface
-        public void reply(String key, final String error, final String response) {
-            Double doubleKey = Double.parseDouble(key);
+        public void reply(String key, final String error, final String responseString) {
+            final Double doubleKey = Double.parseDouble(key);
+            final Statement<?> statement = mSentRequestStatementMap.get(doubleKey);
 
-            final Piggie.Callback callback = callbackMap.get(doubleKey);
-            if (callback != null) {
-                mMainHandler.post(new Runnable() {
-                    public void run() {
-                        callback.callback(error, response);
-                    }
-                });
-            } else {
-                Log.w(TAG, "No callback for key: " + doubleKey);
-            }
+            mMainHandler.post(new Runnable() {
+                public void run() {
+                    respond(doubleKey, statement, error, responseString);
+                }
+            });
         }
     }
 
-    private class QueueStatement {
+    private class Statement<R> {
         private String mPath;
         private String mJsonData;
-        private Piggie.Callback mCallback;
+        private Class<R> mResponseClass;
+        private Piggie.Callback<R> mCallback;
 
-        public QueueStatement(String path, String data, Piggie.Callback callback) {
+        public Statement(String path, String data, Class<R> responseClass, Piggie.Callback<R> callback) {
             mPath = path;
             mJsonData = data;
+            mResponseClass = responseClass;
             mCallback = callback;
         }
 
@@ -129,7 +157,11 @@ public class WebViewWrapper {
             return mJsonData;
         }
 
-        public Piggie.Callback getCallback() {
+        public Class<R> getResponseClass() {
+            return mResponseClass;
+        }
+
+        public Piggie.Callback<R> getCallback() {
             return mCallback;
         }
     }
