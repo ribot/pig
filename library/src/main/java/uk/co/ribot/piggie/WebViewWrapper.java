@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class WebViewWrapper {
+class WebViewWrapper {
     private static final String TAG = "WebViewWrapper";
 
     private final WebView mWebView;
