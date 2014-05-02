@@ -79,11 +79,9 @@ public class WebViewWrapper {
         } while (callbackMap.containsKey(randomKey));
 
         jsonData = jsonData.replace("\"", "\\\"");
+        callbackMap.put(randomKey, callback);
 
         String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + path + "\", \"" + jsonData + "\")";
-        Log.d(TAG, "jsUrl: " + jsUrl);
-
-        callbackMap.put(randomKey, callback);
         mWebView.loadUrl(jsUrl);
     }
 
