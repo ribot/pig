@@ -1,19 +1,24 @@
 package uk.co.ribot.piggie;
 
 import android.content.Context;
+import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
 /**
  * Piggie is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
  */
 public class Piggie {
+    private static final String TAG = "Piggie";
+
     // The static singleton instance of Piggie
     private static Piggie sPiggie;
+    private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
 
     /**
      * Get the singleton instance of Piggie.
@@ -37,7 +42,7 @@ public class Piggie {
      * @param context The Context used to create Piggie with.
      */
     private Piggie(Context context) {
-        mWebViewWrapper = new WebViewWrapper(context);
+        mWebViewWrapper = new WebViewWrapper(context, this);
         mGson = new Gson();
     }
 
@@ -95,6 +100,7 @@ public class Piggie {
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
+    @SuppressWarnings("unchecked") // We are checking the type before casting
     public <D, R> void send(String path, Class<D> dataClass, D data, Callback<R> callback) {
         String json = "";
         if (data != null) {
@@ -111,12 +117,54 @@ public class Piggie {
 
             if (responseType instanceof Class) {
                 Class<R> clazz = (Class<R>) responseType;
-                mWebViewWrapper.js(path, json, clazz, callback);
+                sendAndStore(path, json, clazz, callback);
             } else {
                 throw new IllegalArgumentException("Can't get the Class object from the generic type from the Piggie.Callback");
             }
         } else {
             throw new IllegalArgumentException("Can't get the generic type argument from the Piggie.Callback");
+        }
+    }
+
+    private <R> void sendAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
+        // Generate a random key so we can match the response later
+        double randomKey;
+        do {
+            randomKey = Math.round(Math.random() * 40000);
+        } while (mSentMessageMap.containsKey(randomKey));
+
+        // Store the callback for the response later
+        // TODO: Do we need to do this if callback == null?
+        Message<R> message = new Message<R>(path, responseType, callback);
+        mSentMessageMap.put(randomKey, message);
+
+        // Send the request through the javascript layer
+        mWebViewWrapper.js(randomKey, path, json, responseType, callback);
+    }
+
+    // TODO: Find a way to avoid unchecked operations
+    void response(Double key, String error, String responseString) {
+        Message message = mSentMessageMap.remove(key);
+        // TODO: Check for null message from the map. Shouldn't happen though
+
+        final Piggie.Callback callback = message.getCallback();
+        final Class responseClass = message.getResponseType();
+
+        if (callback != null) {
+            if (error != null) {
+                callback.callback(error, null);
+            } else {
+                Object response;
+                if (responseClass == String.class) {
+                    response = responseString;
+                } else {
+                    response = mGson.fromJson(responseString, responseClass);
+                }
+                callback.callback(null, response);
+
+            }
+        } else {
+            Log.w(TAG, "No callback for key: " + key);
         }
     }
 
@@ -147,5 +195,29 @@ public class Piggie {
          *                 converted to an R Object using Gson.
          */
         void callback(String error, R response);
+    }
+
+    private class Message<R> {
+        private String mPath;
+
+        private Class<R> mResponseType;
+        private Callback<R> mCallback;
+        private Message(String path, Class<R> responseType, Callback<R> callback) {
+            this.mPath = path;
+            this.mResponseType = responseType;
+            this.mCallback = callback;
+        }
+
+        public String getPath() {
+            return mPath;
+        }
+
+        public Class<R> getResponseType() {
+            return mResponseType;
+        }
+
+        public Callback<R> getCallback() {
+            return mCallback;
+        }
     }
 }
