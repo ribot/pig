@@ -30,4 +30,23 @@ describe( 'Handler', function() {
 
     assert( spy.called );
   } );
+
+
+  it( 'should error when attempting to register a path twice', function() {
+    // Setup the first handler
+    piggie.handle( 'event', function( data, res ) {
+      res.send( 'String' );
+    } );
+
+    // Attempt to setup the second handler
+    try {
+      piggie.handle( 'event', function( data, res ) {
+        res.send( 'String' );
+      } );
+    } catch ( e ) {
+      return assert( true );
+    }
+
+    assert( false );
+  } );
 } );
