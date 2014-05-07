@@ -42,6 +42,17 @@ public class Piggie {
     }
 
     /**
+     * Creates a new instance of Piggie with a given WebViewWrapper
+     * @hide
+     * @param context The Context used to create Piggie with.
+     * @param webViewWrapper The instance of WebViewWrapper to use
+     */
+    Piggie(Context context, WebViewWrapper webViewWrapper) {
+        mWebViewWrapper = webViewWrapper;
+        mGson = new Gson();
+    }
+
+    /**
      * Send a message to Piggie with a given Callback.
      * @param path The path to call in JavaScript.
      * @param callback The callback you want to receive the response back to. May be null.
