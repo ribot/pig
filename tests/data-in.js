@@ -19,7 +19,7 @@ describe( 'Data In', function() {
     var res = new Response( '1' );
     var spy = sinon.spy( res, 'send');
     piggie.send( res, 'event' );
-    assert(spy.calledWith( 'Done' ));
+    assert( spy.calledWith( 'Done' ) );
   } );
 
 
@@ -32,8 +32,8 @@ describe( 'Data In', function() {
     // Send the request and spy on the response
     var res = new Response( '1' );
     var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '\"data goes in\"' );
-    assert(spy.calledWith( 'data goes in' ));
+    piggie.send( res, 'event', '"data goes in"' );
+    assert( spy.calledWith( 'data goes in' ) );
   } );
 
 
@@ -47,7 +47,7 @@ describe( 'Data In', function() {
     var res = new Response( '1' );
     var spy = sinon.spy( res, 'send');
     piggie.send( res, 'event', '100' );
-    assert(spy.calledWith( 100 ));
+    assert( spy.calledWith( 100 ) );
   } );
 
 
@@ -60,7 +60,49 @@ describe( 'Data In', function() {
     // Send the request and spy on the response
     var res = new Response( '1' );
     var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '{\"name\":\"Big Jeff\"}' );
-    assert(spy.calledWith( 'Big Jeff' ));
+    piggie.send( res, 'event', '{"name":"Big Jeff"}' );
+    assert( spy.calledWith( 'Big Jeff' ) );
+  } );
+
+
+  it( 'should respond when a JSON array is passed in', function() {
+    // Setup the handler
+    piggie.handle( 'event', function( data, res ) {
+      res.send( true );
+    } );
+
+    // Send the request and spy on the response
+    var res = new Response( '1' );
+    var spy = sinon.spy( res, 'send');
+    piggie.send( res, 'event', '[ "Big Jeff", "Bobbert" ]' );
+    assert( spy.called );
+  } );
+
+
+  it( 'should respond when a JSON boolean is passed in', function() {
+    // Setup the handler
+    piggie.handle( 'event', function( data, res ) {
+      res.send( data );
+    } );
+
+    // Send the request and spy on the response
+    var res = new Response( '1' );
+    var spy = sinon.spy( res, 'send');
+    piggie.send( res, 'event', 'true' );
+    assert( spy.calledWith( true ) );
+  } );
+
+
+  it( 'should respond when an error when an invalid JSON string is passed in', function() {
+    // Setup the handler
+    piggie.handle( 'event', function( data, res ) {
+      res.send( data.name );
+    } );
+
+    // Send the request and spy on the error
+    var res = new Response( '1' );
+    var spy = sinon.spy( res, 'error');
+    piggie.send( res, 'event', '"name:"Big Jeff"}' );
+    assert( spy.called );
   } );
 } );
