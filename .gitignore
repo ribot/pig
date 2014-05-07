@@ -12,6 +12,7 @@ logs
 results
 npm-debug.log
 node_modules
+coverage.html
 
 # OSX
 .DS_Store

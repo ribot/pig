@@ -1,1 +1,3 @@
-module.exports = exports = require( './lib/bridge' );
+module.exports = process.env.PIGGIE_COVERAGE
+  ? require( './lib-cov/bridge' )
+  : require( './lib/bridge' );
