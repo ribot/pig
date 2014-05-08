@@ -126,6 +126,10 @@ public class Piggie {
         }
     }
 
+    /**
+     * Performs the actual sending of the data to the WebViewWrapper and stores the request to
+     * be matched with a response later.
+     **/
     private <R> void sendAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
         // Generate a random key so we can match the response later
         double randomKey;
@@ -142,6 +146,9 @@ public class Piggie {
         mWebViewWrapper.js(randomKey, path, json, responseType, callback);
     }
 
+    /**
+     *  Used to receive and process responses from the JS layer via a WebViewWrapper.
+     **/
     // TODO: Find a way to avoid unchecked operations
     void response(Double key, String error, String responseString) {
         Message message = mSentMessageMap.remove(key);
@@ -166,6 +173,14 @@ public class Piggie {
         } else {
             Log.w(TAG, "No callback for key: " + key);
         }
+    }
+
+    /**
+     * Get the instance of WebViewWrapper we are using.
+     * @return Returns the WebViewWrapper instance
+     **/
+    WebViewWrapper getWebViewWrapper() {
+        return mWebViewWrapper;
     }
 
     /**

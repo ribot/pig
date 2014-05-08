@@ -2,6 +2,8 @@ package uk.co.ribot.piggie;
 
 import android.app.Activity;
 import android.content.Context;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,12 +27,18 @@ public class PiggieTest {
     }
 
     @Test
-    public void testCreation() throws Exception {
-        Context context = Robolectric.getShadowApplication().getApplicationContext();
-        MockWebViewWrapper wrapper = new MockWebViewWrapper(context);
+    public void testSendAndReceive() throws Exception {
+        Piggie piggie = PiggieTestUtils.getMockedPiggie();
 
-        Piggie piggie = new Piggie(context, wrapper);
+        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+            public void handle(String data) {
+                send("OK");
+            }
+        });
 
-        assertTrue(piggie != null);
+        PiggieTestUtils.Response response = PiggieTestUtils.sendMockData(piggie, "event", null, null);
+        assertTrue(response.didReceive());
+        assertTrue(response.getError() == null);
+        assertTrue(response.getResponse().equals("OK"));
     }
 }
