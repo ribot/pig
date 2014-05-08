@@ -52,7 +52,6 @@ public class MockWebViewWrapper extends WebViewWrapper {
             mPiggie.response(mKey, error, null);
         }
         void send(String response) {
-            System.out.println("[INFO](MockWebViewWrapper) Sending response: " + response);
             mPiggie.response(mKey, null, response);
         }
     }
