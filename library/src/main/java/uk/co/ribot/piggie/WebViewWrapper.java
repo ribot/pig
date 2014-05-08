@@ -9,29 +9,25 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.google.gson.Gson;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 class WebViewWrapper {
     private static final String TAG = "WebViewWrapper";
 
+    private final Piggie mPiggie;
     private final WebView mWebView;
     private final Handler mMainHandler;
-    private final Gson mGson;
 
     private boolean mIsReady;
     private final Queue<Statement> mPreStartStatementQueue = new ConcurrentLinkedQueue<Statement>();
-    private final Map<Double, Statement> mSentRequestStatementMap = new HashMap<Double, Statement>();
 
-    public WebViewWrapper(Context context) {
+    public WebViewWrapper(Context context, Piggie piggie) {
+        mPiggie = piggie;
         mWebView = new WebView(context);
         mMainHandler = new Handler(Looper.getMainLooper());
-        mGson = new Gson();
 
         initWebView();
     }
@@ -77,8 +73,8 @@ class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public <R> void js(String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
-        js(new Statement<R>(path, jsonData, responseClass, callback));
+    public <R> void js(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
+        js(new Statement<R>(key, path, jsonData, responseClass, callback));
     }
 
     private <R> void js(Statement<R> statement) {
@@ -87,64 +83,40 @@ class WebViewWrapper {
             return;
         }
 
-        double randomKey;
-        do {
-            randomKey = Math.round(Math.random() * 40000);
-        } while (mSentRequestStatementMap.containsKey(randomKey));
-        mSentRequestStatementMap.put(randomKey, statement);
-
         String jsonData = statement.getJsonData().replace("\"", "\\\"");
-        String jsUrl = "javascript:window.bridge.send(" + randomKey + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
+        String jsUrl = "javascript:window.bridge.send(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
-    }
-
-    @SuppressWarnings("unchecked") // We are checking the generic type is String before string the String object
-    private <R> void respond(Double key, Statement<R> statement, String error, String responseString) {
-        final Piggie.Callback<R> callback = statement.getCallback();
-        final Class<R> responseClass = statement.getResponseClass();
-
-        if (callback != null) {
-            if (error != null) {
-                callback.callback(error, null);
-            } else {
-                R response;
-                if (responseClass == String.class) {
-                    response = (R) responseString;
-                } else {
-                    response = mGson.fromJson(responseString, responseClass);
-                }
-                callback.callback(null, response);
-            }
-        } else {
-            Log.w(TAG, "No callback for key: " + key);
-        }
     }
 
     private class JsToNativeInterface {
         @JavascriptInterface
         public void reply(String key, final String error, final String responseString) {
             final Double doubleKey = Double.parseDouble(key);
-            final Statement<?> statement = mSentRequestStatementMap.get(doubleKey);
-
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    respond(doubleKey, statement, error, responseString);
+                    mPiggie.response(doubleKey, error, responseString);
                 }
             });
         }
     }
 
     private class Statement<R> {
+        private Double mKey;
+
         private String mPath;
         private String mJsonData;
         private Class<R> mResponseClass;
         private Piggie.Callback<R> mCallback;
-
-        public Statement(String path, String data, Class<R> responseClass, Piggie.Callback<R> callback) {
+        public Statement(Double key, String path, String data, Class<R> responseClass, Piggie.Callback<R> callback) {
+            mKey = key;
             mPath = path;
             mJsonData = data;
             mResponseClass = responseClass;
             mCallback = callback;
+        }
+
+        public Double getKey() {
+            return mKey;
         }
 
         public String getPath() {

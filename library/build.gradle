@@ -5,11 +5,13 @@ buildscript {
 
     dependencies {
         classpath 'com.github.dcendents:android-maven-plugin:1.0'
+        classpath 'org.robolectric.gradle:gradle-android-test-plugin:0.9.+'
     }
 }
 
 apply plugin: 'android-library'
 apply plugin: 'android-maven'
+apply plugin: 'android-test'
 
 android {
     compileSdkVersion 19
@@ -17,7 +19,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 18
         versionCode 1
         versionName "1.0"
     }
@@ -25,6 +27,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
     compile 'com.google.code.gson:gson:2.2.4'
+
+    androidTestCompile 'junit:junit:4.10'
+    androidTestCompile 'org.robolectric:robolectric:2.1.+'
 }
