@@ -8,7 +8,10 @@ import com.google.gson.JsonSyntaxException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Piggie is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
@@ -19,6 +22,7 @@ public class Piggie {
     // The static singleton instance of Piggie
     private static Piggie sPiggie;
     private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
+    private final Map<String, List<EventListener>> mEventListenerMap = new HashMap<String, List<EventListener>>();
 
     /**
      * Get the singleton instance of Piggie.
@@ -56,6 +60,10 @@ public class Piggie {
         mWebViewWrapper = webViewWrapper;
         mGson = new Gson();
     }
+
+    /***********/
+    /* REQ/RES */
+    /***********/
 
     /**
      * Send a message to Piggie with a given Callback.
@@ -147,7 +155,7 @@ public class Piggie {
     }
 
     /**
-     *  Used to receive and process responses from the JS layer via a WebViewWrapper.
+     * Used to receive and process responses from the JS layer via a WebViewWrapper.
      **/
     // TODO: Find a way to avoid unchecked operations
     void response(Double key, String error, String responseString) {
@@ -175,6 +183,59 @@ public class Piggie {
         }
     }
 
+    /**********/
+    /* EVENTS */
+    /**********/
+
+    /**
+     * Register a listener for the given event.
+     * @param event The event to listen for.
+     * @param listener The listener
+     */
+    public void addListener(String event, EventListener listener) {
+        // Get and possibly setup the list of listeners
+        List<EventListener> currentListeners = mEventListenerMap.get(event);
+        if (currentListeners == null) {
+            currentListeners = new ArrayList<EventListener>();
+        }
+
+        // Add the listener to the list and add it back to the map
+        currentListeners.add(listener);
+        mEventListenerMap.put(event, currentListeners);
+    }
+
+    /**
+     * Stop listening for the given event.
+     * @param event The event to stop listening for.
+     * @param listener The listener
+     */
+    public void removeListener(String event, EventListener listener) {
+        // Get and possibly setup the list of listeners
+        List<EventListener> currentListener = mEventListenerMap.get(event);
+        if (currentListener == null) {
+            currentListener = new ArrayList<EventListener>();
+        }
+
+        // Remove the listener from the list
+        currentListener.remove(listener);
+        mEventListenerMap.put(event, currentListener);
+    }
+
+    /**
+     * Used to receive and process incoming JavaScript events
+     **/
+    void incomingJavaScriptEvent(String event, String data) {
+        // Get the list of listeners
+        List<EventListener> listeners = mEventListenerMap.get(event);
+
+        // Loop through and execute all event listeners
+        if (listeners != null) {
+            for (EventListener listener : listeners) {
+                listener.onEvent(event, data);
+            }
+        }
+    }
+
     /**
      * Get the instance of WebViewWrapper we are using.
      * @return Returns the WebViewWrapper instance
@@ -195,6 +256,18 @@ public class Piggie {
         } catch (JsonSyntaxException e) {
             return false;
         }
+    }
+
+    /**
+     * An interface used to get a callback for triggered events.
+     */
+    public interface EventListener {
+        /**
+         * Called when an event you have registered for has been trigger in JavaScript or Native code.
+         * @param event The name of the event which was triggered.
+         * @param data The data associated with the event. May be null.
+         */
+        void onEvent(String event, String data);
     }
 
     /**

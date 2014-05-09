@@ -98,6 +98,15 @@ class WebViewWrapper {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void event(final String type, final String data) {
+            mMainHandler.post(new Runnable() {
+                public void run() {
+                    mPiggie.incomingJavaScriptEvent(type, data);
+                }
+            });
+        }
     }
 
     private class Statement<R> {
