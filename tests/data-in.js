@@ -1,108 +1,120 @@
-var sinon = require( 'sinon' )
+var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
     piggie = require( '../index' ),
     Response = process.env.PIGGIE_COVERAGE ? require( '../lib-cov/response' ) : require( '../lib/response' );
 
-describe( 'Data In', function() {
-  beforeEach( function() {
+describe( 'Data in', function() {
+
+  beforeEach( function () {
     piggie.reset();
   } );
 
 
-  it( 'should respond when no data is passed in', function() {
+  it( 'should call the handler when no data is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' );
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( 'Done' );
+    piggie.register( 'event', function ( data, response ) {
+      assert( true );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( 'Done' ) );
+    // Send the request
+    piggie.execute( dummyResponse, 'event' );
+
   } );
 
 
-  it( 'should respond when a single JSON string is passed in', function() {
+  it( 'should call the handler when a JSON string is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        dummyData = 'data goes in';
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( data );
+    piggie.register( 'event', function ( data, response ) {
+      assert.strictEqual( data, dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '"data goes in"' );
-    assert( spy.calledWith( 'data goes in' ) );
+    // Send the request
+    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+
   } );
 
 
-  it( 'should respond when a single JSON number is passed in', function() {
+  it( 'should call the handler when a JSON number is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        dummyData = 100;
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( data );
+    piggie.register( 'event', function ( data, response ) {
+      assert.strictEqual( data, dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '100' );
-    assert( spy.calledWith( 100 ) );
+    // Send the request
+    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+
+  } );
+
+  it( 'should call the handler when a JSON boolean is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        dummyData = true;
+
+    // Setup the handler
+    piggie.register( 'event', function ( data, response ) {
+      assert.strictEqual( data, dummyData );
+    } );
+
+    // Send the request
+    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+
   } );
 
 
-  it( 'should respond when a JSON object is passed in', function() {
+  it( 'should call the handler when a JSON object is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        dummyData = {
+          name: 'Big Jeff'
+        };
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( data.name );
+    piggie.register( 'event', function ( data, response ) {
+      assert.deepEqual( data, dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '{"name":"Big Jeff"}' );
-    assert( spy.calledWith( 'Big Jeff' ) );
+    // Send the request
+    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+
   } );
 
 
-  it( 'should respond when a JSON array is passed in', function() {
+  it( 'should call the handler when a JSON array is passed in', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        dummyData = [
+          'Big Jeff',
+          'Bobbert'
+        ];
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( true );
+    piggie.register( 'event', function ( data, response ) {
+      assert.deepEqual( data, dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', '[ "Big Jeff", "Bobbert" ]' );
-    assert( spy.called );
+    // Send the request
+    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+
   } );
 
 
-  it( 'should respond when a JSON boolean is passed in', function() {
-    // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( data );
-    } );
+  it( 'should call the handlers response fail callback when an invalid JSON string is passed in', function () {
+      var dummyResponse = new Response( 'dummy-key' ),
+        responseFailSpy = sinon.spy( dummyResponse, 'fail' ),
+        dummyData = '"name:"Big Jeff"}';
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event', 'true' );
-    assert( spy.calledWith( true ) );
+    // Setup the handler
+    piggie.register( 'event', function ( data, response ) { } );
+
+    // Send the request and spy on the fail callback
+    piggie.execute( dummyResponse, 'event', dummyData );
+    assert( responseFailSpy.called );
+
   } );
 
-
-  it( 'should respond when an error when an invalid JSON string is passed in', function() {
-    // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( data.name );
-    } );
-
-    // Send the request and spy on the error
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'error');
-    piggie.send( res, 'event', '"name:"Big Jeff"}' );
-    assert( spy.called );
-  } );
 } );
