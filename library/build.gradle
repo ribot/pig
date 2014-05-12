@@ -32,3 +32,9 @@ dependencies {
     androidTestCompile 'junit:junit:4.10'
     androidTestCompile 'org.robolectric:robolectric:2.1.+'
 }
+
+task generateApiDocs(type: Javadoc) {
+    source = android.sourceSets.main.allJava
+    destinationDir = reporting.file("rest-api-docs")
+    exclude "**/PiggieApplication.java"
+}
