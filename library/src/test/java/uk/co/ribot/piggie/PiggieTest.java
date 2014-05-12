@@ -96,10 +96,18 @@ public class PiggieTest {
 
         piggie.execute("event", null, null, new Piggie.Callback<String>() {
             @Override
-            public void callback(String error, String response) {
+            public void onSuccess(String response) {
                 stringReceived = true;
-                stringReceivedError = error;
+                stringReceivedError = null;
                 stringReceivedResponse = response;
+                lock.countDown();
+            }
+
+            @Override
+            public void onError(String code, String name, String message) {
+                stringReceived = true;
+                stringReceivedError = message;
+                stringReceivedResponse = null;
                 lock.countDown();
             }
         });
@@ -132,10 +140,18 @@ public class PiggieTest {
 
         piggie.execute("event", null, null, new Piggie.Callback<Integer>() {
             @Override
-            public void callback(String error, Integer response) {
+            public void onSuccess(Integer response) {
                 numberReceived = true;
-                numberReceivedError = error;
+                numberReceivedError = null;
                 numberReceivedResponse = response;
+                lock.countDown();
+            }
+
+            @Override
+            public void onError(String code, String name, String message) {
+                numberReceived = true;
+                numberReceivedError = message;
+                numberReceivedResponse = null;
                 lock.countDown();
             }
         });
@@ -168,10 +184,18 @@ public class PiggieTest {
 
         piggie.execute("event", null, null, new Piggie.Callback<Dog>() {
             @Override
-            public void callback(String error, Dog response) {
+            public void onSuccess(Dog response) {
                 objectReceived = true;
-                objectReceivedError = error;
+                objectReceivedError = null;
                 objectReceivedResponse = response;
+                lock.countDown();
+            }
+
+            @Override
+            public void onError(String code, String name, String message) {
+                objectReceived = true;
+                objectReceivedError = message;
+                objectReceivedResponse = null;
                 lock.countDown();
             }
         });

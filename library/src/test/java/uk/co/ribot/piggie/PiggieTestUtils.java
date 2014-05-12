@@ -44,10 +44,18 @@ public class PiggieTestUtils {
 
         piggie.execute(path, dataClass, data, new Piggie.Callback<String>() {
             @Override
-            public void callback(String error, String response) {
+            public void onSuccess(String response) {
                 received = true;
-                receivedError = error;
+                receivedError = null;
                 receivedResponse = response;
+                lock.countDown();
+            }
+
+            @Override
+            public void onError(String code, String name, String message) {
+                received = true;
+                receivedError = message;
+                receivedResponse = null;
                 lock.countDown();
             }
         });

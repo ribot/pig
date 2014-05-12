@@ -158,7 +158,7 @@ public class Piggie {
      * Used to receive and process responses from the JS layer via a WebViewWrapper.
      **/
     // TODO: Find a way to avoid unchecked operations
-    void response(Double key, String error, String responseString) {
+    void successResponse(Double key, String responseString) {
         Message message = mSentMessageMap.remove(key);
         // TODO: Check for null message from the map. Shouldn't happen though
 
@@ -166,20 +166,31 @@ public class Piggie {
         final Class responseClass = message.getResponseType();
 
         if (callback != null) {
-            if (error != null) {
-                callback.callback(error, null);
+            Object response;
+            if (responseClass == String.class) {
+                response = responseString;
             } else {
-                Object response;
-                if (responseClass == String.class) {
-                    response = responseString;
-                } else {
-                    response = mGson.fromJson(responseString, responseClass);
-                }
-                callback.callback(null, response);
-
+                response = mGson.fromJson(responseString, responseClass);
             }
+            callback.onSuccess(response);
         } else {
-            Log.w(TAG, "No callback for key: " + key);
+            Log.w(TAG, "No success callback for key: " + key);
+        }
+    }
+
+    /**
+     * Used to receive and process responses from the JS layer via a WebViewWrapper.
+     **/
+    // TODO: Find a way to avoid unchecked operations
+    void errorResponse(Double key, String code, String name, String errorMessage) {
+        Message message = mSentMessageMap.remove(key);
+        // TODO: Check for null message from the map. Shouldn't happen though
+
+        final Piggie.Callback callback = message.getCallback();
+        if (callback != null) {
+            callback.onError(code, name, errorMessage);
+        } else {
+            Log.w(TAG, "No error callback for key: " + key);
         }
     }
 
@@ -296,13 +307,19 @@ public class Piggie {
      */
     public interface Callback<R> {
         /**
-         * Called when there is a response from a Piggy JavaScript handler.
-         * @param error Null if there was no error. A String with the error description if there was.
-         * @param response Null if there was no response or an error, a response of the type R if there was a response.
-         *                 If R is String then the response is an untouched JSON String. If not the String was
-         *                 converted to an R Object using Gson.
+         * Called when there is a successful response from a Piggy JavaScript handler.
+         * @param response Null if there was no response or a response of type R. If R is String then the response
+         *                 is an untouched JSON String. If not the String was converted to an R Object using Gson.
          */
-        void callback(String error, R response);
+        void onSuccess(R response);
+
+        /**
+         * Called when there is an error reported from a Piggy JavaScript handler.
+         * @param code The status code of the error. Use to check for a specific error.
+         * @param name The type of error that was reported.
+         * @param message The message reported for the error
+         */
+        void onError(String code, String name, String message);
     }
 
     private class Message<R> {
