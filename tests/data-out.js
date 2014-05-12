@@ -1,80 +1,101 @@
-var sinon = require( 'sinon' )
+var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
     piggie = require( '../index' ),
     Response = process.env.PIGGIE_COVERAGE ? require( '../lib-cov/response' ) : require( '../lib/response' );
 
-describe( 'Data Out', function() {
-  beforeEach( function() {
+describe( 'Data out', function() {
+
+  beforeEach( function () {
     piggie.reset();
   } );
 
 
-  it( 'can respond with a string', function() {
+  it( 'should call the success callback with a string', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        responseSuccessSpy = sinon.spy( dummyResponse, 'success' ),
+        dummyData = 'data goes in';
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( 'String' );
+    piggie.register( 'event', function ( data, response ) {
+      response.success( dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( 'String' ) );
+    // Send the request and spy on the success callback
+    piggie.execute( dummyResponse, 'event' );
+    assert( responseSuccessSpy.calledWith( dummyData ) );
+
   } );
 
 
-  it( 'can respond with a number', function() {
+  it( 'should call the success callback with a number', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        responseSuccessSpy = sinon.spy( dummyResponse, 'success' ),
+        dummyData = 100;
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( 123456789 );
+    piggie.register( 'event', function ( data, response ) {
+      response.success( dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( 123456789 ) );
+    // Send the request and spy on the success callback
+    piggie.execute( dummyResponse, 'event' );
+    assert( responseSuccessSpy.calledWith( dummyData ) );
+
+  } );
+
+  it( 'should call the success callback with a boolean', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        responseSuccessSpy = sinon.spy( dummyResponse, 'success' ),
+        dummyData = true;
+
+    // Setup the handler
+    piggie.register( 'event', function ( data, response ) {
+      response.success( dummyData );
+    } );
+
+    // Send the request and spy on the success callback
+    piggie.execute( dummyResponse, 'event' );
+    assert( responseSuccessSpy.calledWith( dummyData ) );
+
   } );
 
 
-  it( 'can respond with a boolean', function() {
+  it( 'should call the success callback with an object', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        responseSuccessSpy = sinon.spy( dummyResponse, 'success' ),
+        dummyData = {
+          name: 'Big Jeff'
+        };
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( false );
+    piggie.register( 'event', function ( data, response ) {
+      response.success( dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( false ) );
+    // Send the request and spy on the success callback
+    piggie.execute( dummyResponse, 'event' );
+    assert( responseSuccessSpy.calledWith( dummyData ) );
+
   } );
 
 
-  it( 'can respond with a JSON object', function() {
+  it( 'should call the success callback with an array', function () {
+    var dummyResponse = new Response( 'dummy-key' ),
+        responseSuccessSpy = sinon.spy( dummyResponse, 'success' ),
+        dummyData = [
+          'Big Jeff',
+          'Bobbert'
+        ];
+
     // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( { name: "Big Jeff" } );
+    piggie.register( 'event', function ( data, response ) {
+      response.success( dummyData );
     } );
 
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( { name: "Big Jeff" } ) );
+    // Send the request and spy on the success callback
+    piggie.execute( dummyResponse, 'event' );
+    assert( responseSuccessSpy.calledWith( dummyData ) );
+
   } );
 
-
-  it( 'can respond with a JSON array', function() {
-    // Setup the handler
-    piggie.handle( 'event', function( data, res ) {
-      res.send( [ "Big Jeff", "Bobbert" ] );
-    } );
-
-    // Send the request and spy on the response
-    var res = new Response( '1' );
-    var spy = sinon.spy( res, 'send');
-    piggie.send( res, 'event' );
-    assert( spy.calledWith( [ "Big Jeff", "Bobbert" ] ) );
-  } );
 } );
