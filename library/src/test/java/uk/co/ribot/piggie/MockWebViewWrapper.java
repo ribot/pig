@@ -18,7 +18,7 @@ public class MockWebViewWrapper extends WebViewWrapper {
     }
 
     @Override
-    public <R> void js(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
+    public <R> void execute(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
         Handler handler = mMockHandlers.get(path);
         if (handler != null) {
             handler.doHandler(key, jsonData);

@@ -184,6 +184,70 @@ public class PiggieTest {
         assertTrue(objectReceivedResponse.getToy().equals("Ball"));
     }
 
+    private boolean emitNoData_emited = false;
+    private String emitNoData_event;
+    private String emitNoData_data;
+    @Test
+    public void testEmitEventNoData() throws Exception {
+        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+
+        emitNoData_emited = false;
+        emitNoData_event = null;
+        emitNoData_data = null;
+
+        final CountDownLatch lock = new CountDownLatch(1);
+
+        piggie.addListener("event", new Piggie.EventListener() {
+            @Override
+            public void onEvent(String event, String data) {
+                emitNoData_emited = true;
+                emitNoData_event = event;
+                emitNoData_data = data;
+                lock.countDown();
+            }
+        });
+
+        piggie.emit("event");
+
+        lock.await(2000, TimeUnit.MILLISECONDS);
+
+        assertTrue(emitNoData_emited);
+        assertTrue(emitNoData_event.equals("event"));
+        assertTrue(emitNoData_data == null);
+    }
+
+    private boolean emitData_emited = false;
+    private String emitData_event;
+    private String emitData_data;
+    @Test
+    public void testEmitEventData() throws Exception {
+        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+
+        emitData_emited = false;
+        emitData_event = null;
+        emitData_data = null;
+
+        final CountDownLatch lock = new CountDownLatch(1);
+
+        piggie.addListener("event", new Piggie.EventListener() {
+            @Override
+            public void onEvent(String event, String data) {
+                emitData_emited = true;
+                emitData_event = event;
+                emitData_data = data;
+                lock.countDown();
+            }
+        });
+
+        piggie.emit("event", "data");
+
+        lock.await(2000, TimeUnit.MILLISECONDS);
+
+        assertTrue(emitData_emited);
+        assertTrue(emitData_event.equals("event"));
+        assertTrue(emitData_data.equals("data"));
+    }
+
     private class Dog {
         @SerializedName("name") private String mName;
         @SerializedName("toy") private String mToy;
