@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.Pair;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -23,6 +24,7 @@ class WebViewWrapper {
 
     private boolean mIsReady;
     private final Queue<Statement> mPreStartStatementQueue = new ConcurrentLinkedQueue<Statement>();
+    private final Queue<Pair<String, String>> mPreStartEventEmitQueue = new ConcurrentLinkedQueue<Pair<String, String>>();
 
     public WebViewWrapper(Context context, Piggie piggie) {
         mPiggie = piggie;
@@ -32,7 +34,7 @@ class WebViewWrapper {
         initWebView();
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     private void initWebView() {
         // Enable JavaScript
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -57,9 +59,14 @@ class WebViewWrapper {
                 mIsReady = true;
 
                 for (Statement statement : mPreStartStatementQueue) {
-                    js(statement);
+                    execute(statement);
                 }
                 mPreStartStatementQueue.clear();
+
+                for (Pair<String, String> event : mPreStartEventEmitQueue) {
+                    emit(event.first, event.second);
+                }
+                mPreStartEventEmitQueue.clear();
             }
         });
 
@@ -73,18 +80,34 @@ class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public <R> void js(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
-        js(new Statement<R>(key, path, jsonData, responseClass, callback));
+    public <R> void execute(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
+        execute(new Statement<R>(key, path, jsonData, responseClass, callback));
     }
 
-    private <R> void js(Statement<R> statement) {
+    private <R> void execute(Statement<R> statement) {
         if (!mIsReady) {
             mPreStartStatementQueue.offer(statement);
             return;
         }
 
         String jsonData = statement.getJsonData().replace("\"", "\\\"");
-        String jsUrl = "javascript:window.bridge.send(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
+        String jsUrl = "javascript:window.piggie._execute(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
+        mWebView.loadUrl(jsUrl);
+    }
+
+    public void emit(String event, String data) {
+        if (!mIsReady) {
+            mPreStartEventEmitQueue.offer(Pair.create(event, data));
+            return;
+        }
+
+        if (data == null) {
+            data = "";
+        }
+
+        String jsonType = event.replace("\"", "\\\"");
+        String jsonData = data.replace("\"", "\\\"");
+        String jsUrl = "javascript:window.piggie._nativeEmit(\"" + jsonType + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
     }
 
@@ -95,6 +118,15 @@ class WebViewWrapper {
             mMainHandler.post(new Runnable() {
                 public void run() {
                     mPiggie.response(doubleKey, error, responseString);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void event(final String type, final String data) {
+            mMainHandler.post(new Runnable() {
+                public void run() {
+                    mPiggie.handleEvent(type, data);
                 }
             });
         }

@@ -8,7 +8,10 @@ import com.google.gson.JsonSyntaxException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Piggie is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
@@ -19,6 +22,7 @@ public class Piggie {
     // The static singleton instance of Piggie
     private static Piggie sPiggie;
     private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
+    private final Map<String, List<EventListener>> mEventListenerMap = new HashMap<String, List<EventListener>>();
 
     /**
      * Get the singleton instance of Piggie.
@@ -57,6 +61,10 @@ public class Piggie {
         mGson = new Gson();
     }
 
+    /***********/
+    /* REQ/RES */
+    /***********/
+
     /**
      * Send a message to Piggie with a given Callback.
      * @param path The path to call in JavaScript.
@@ -64,8 +72,8 @@ public class Piggie {
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
-    public <R> void send(String path, Callback<R> callback) {
-        send(path, null, callback);
+    public <R> void execute(String path, Callback<R> callback) {
+        execute(path, null, callback);
     }
 
     /**
@@ -77,13 +85,13 @@ public class Piggie {
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
-    public <R> void send(String path, Object data, Callback<R> callback) {
+    public <R> void execute(String path, Object data, Callback<R> callback) {
         Class dataClass = null;
         if (data != null) {
             dataClass = data.getClass();
         }
 
-        send(path, dataClass, data, callback);
+        execute(path, dataClass, data, callback);
     }
 
     /**
@@ -101,7 +109,7 @@ public class Piggie {
      *           String, or use another data type to convert using Gson.
      */
     @SuppressWarnings("unchecked") // We are checking the type before casting
-    public <D, R> void send(String path, Class<D> dataClass, D data, Callback<R> callback) {
+    public <D, R> void execute(String path, Class<D> dataClass, D data, Callback<R> callback) {
         String json = "";
         if (data != null) {
             if (data instanceof String && isAlreadyJson((String) data)) {
@@ -117,7 +125,7 @@ public class Piggie {
 
             if (responseType instanceof Class) {
                 Class<R> clazz = (Class<R>) responseType;
-                sendAndStore(path, json, clazz, callback);
+                executeAndStore(path, json, clazz, callback);
             } else {
                 throw new IllegalArgumentException("Can't get the Class object from the generic type from the Piggie.Callback");
             }
@@ -130,7 +138,7 @@ public class Piggie {
      * Performs the actual sending of the data to the WebViewWrapper and stores the request to
      * be matched with a response later.
      **/
-    private <R> void sendAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
+    private <R> void executeAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
         // Generate a random key so we can match the response later
         double randomKey;
         do {
@@ -143,11 +151,11 @@ public class Piggie {
         mSentMessageMap.put(randomKey, message);
 
         // Send the request through the javascript layer
-        mWebViewWrapper.js(randomKey, path, json, responseType, callback);
+        mWebViewWrapper.execute(randomKey, path, json, responseType, callback);
     }
 
     /**
-     *  Used to receive and process responses from the JS layer via a WebViewWrapper.
+     * Used to receive and process responses from the JS layer via a WebViewWrapper.
      **/
     // TODO: Find a way to avoid unchecked operations
     void response(Double key, String error, String responseString) {
@@ -175,6 +183,79 @@ public class Piggie {
         }
     }
 
+    /**********/
+    /* EVENTS */
+    /**********/
+
+    /**
+     * Register a listener for the given event.
+     * @param event The event to listen for.
+     * @param listener The listener
+     */
+    public void addListener(String event, EventListener listener) {
+        // Get and possibly setup the list of listeners
+        List<EventListener> currentListeners = mEventListenerMap.get(event);
+        if (currentListeners == null) {
+            currentListeners = new ArrayList<EventListener>();
+        }
+
+        // Add the listener to the list and add it back to the map
+        currentListeners.add(listener);
+        mEventListenerMap.put(event, currentListeners);
+    }
+
+    /**
+     * Stop listening for the given event.
+     * @param event The event to stop listening for.
+     * @param listener The listener
+     */
+    public void removeListener(String event, EventListener listener) {
+        // Get and possibly setup the list of listeners
+        List<EventListener> currentListener = mEventListenerMap.get(event);
+        if (currentListener == null) {
+            currentListener = new ArrayList<EventListener>();
+        }
+
+        // Remove the listener from the list
+        currentListener.remove(listener);
+        mEventListenerMap.put(event, currentListener);
+    }
+
+    /**
+     * Emit an event which can be picked up by native code or in JavaScript.
+     * @param event The event name to emit.
+     */
+    public void emit(String event) {
+        emit(event, null);
+    }
+
+    /**
+     * Emit an event which can be picked up by native code or in JavaScript.
+     * @param event The event name to emit.
+     * @param data The data to emit.
+     */
+    public void emit(String event, String data) {
+        // Send the event for the JavaScript side to handle
+        mWebViewWrapper.emit(event, data);
+        // Distribute the event on the native side of the bridge
+        handleEvent(event, data);
+    }
+
+    /**
+     * Used to receive and process incoming JavaScript events
+     **/
+    void handleEvent(String event, String data) {
+        // Get the list of listeners
+        List<EventListener> listeners = mEventListenerMap.get(event);
+
+        // Loop through and execute all event listeners
+        if (listeners != null) {
+            for (EventListener listener : listeners) {
+                listener.onEvent(event, data);
+            }
+        }
+    }
+
     /**
      * Get the instance of WebViewWrapper we are using.
      * @return Returns the WebViewWrapper instance
@@ -195,6 +276,18 @@ public class Piggie {
         } catch (JsonSyntaxException e) {
             return false;
         }
+    }
+
+    /**
+     * An interface used to get a callback for triggered events.
+     */
+    public interface EventListener {
+        /**
+         * Called when an event you have registered for has been trigger in JavaScript or Native code.
+         * @param event The name of the event which was triggered.
+         * @param data The data associated with the event. May be null.
+         */
+        void onEvent(String event, String data);
     }
 
     /**
