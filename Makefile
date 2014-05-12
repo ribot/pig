@@ -1,5 +1,8 @@
 REPORTER = spec
 
+clean:
+	rm -rf lib-cov coverage.html
+
 test:
 	./node_modules/.bin/mocha --reporter $(REPORTER) tests/*
 

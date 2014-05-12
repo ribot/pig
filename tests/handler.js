@@ -6,7 +6,15 @@ var sinon = require( 'sinon' ),
 describe( 'Handler', function() {
 
   beforeEach( function() {
-    piggie.reset();
+    piggie._reset();
+
+    window = {
+      android: {
+        fail: function() {},
+        success: function() {},
+        event: function() {}
+      }
+    };
   } );
 
 
@@ -15,7 +23,7 @@ describe( 'Handler', function() {
         responseFailSpy = sinon.spy( dummyResponse, 'fail' );
 
     // Test the handler calls the fail callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseFailSpy.called );
 
   } );

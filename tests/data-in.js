@@ -6,7 +6,15 @@ var sinon = require( 'sinon' ),
 describe( 'Data in', function() {
 
   beforeEach( function () {
-    piggie.reset();
+    piggie._reset();
+
+    window = {
+      android: {
+        fail: function() {},
+        success: function() {},
+        event: function() {}
+      }
+    };
   } );
 
 
@@ -19,7 +27,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
 
   } );
 
@@ -34,7 +42,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -49,7 +57,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -63,7 +71,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -80,7 +88,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -98,7 +106,7 @@ describe( 'Data in', function() {
     } );
 
     // Send the request
-    piggie.execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -112,7 +120,7 @@ describe( 'Data in', function() {
     piggie.register( 'event', function ( data, response ) { } );
 
     // Send the request and spy on the fail callback
-    piggie.execute( dummyResponse, 'event', dummyData );
+    piggie._execute( dummyResponse, 'event', dummyData );
     assert( responseFailSpy.called );
 
   } );
