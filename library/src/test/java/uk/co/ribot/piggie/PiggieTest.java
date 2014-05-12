@@ -1,6 +1,5 @@
 package uk.co.ribot.piggie;
 
-import android.app.Activity;
 import android.content.Context;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +94,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.send("event", null, null, new Piggie.Callback<String>() {
+        piggie.execute("event", null, null, new Piggie.Callback<String>() {
             @Override
             public void callback(String error, String response) {
                 stringReceived = true;
@@ -131,7 +130,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.send("event", null, null, new Piggie.Callback<Integer>() {
+        piggie.execute("event", null, null, new Piggie.Callback<Integer>() {
             @Override
             public void callback(String error, Integer response) {
                 numberReceived = true;
@@ -167,7 +166,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.send("event", null, null, new Piggie.Callback<Dog>() {
+        piggie.execute("event", null, null, new Piggie.Callback<Dog>() {
             @Override
             public void callback(String error, Dog response) {
                 objectReceived = true;

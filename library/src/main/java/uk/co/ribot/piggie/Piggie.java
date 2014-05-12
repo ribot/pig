@@ -72,8 +72,8 @@ public class Piggie {
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
-    public <R> void send(String path, Callback<R> callback) {
-        send(path, null, callback);
+    public <R> void execute(String path, Callback<R> callback) {
+        execute(path, null, callback);
     }
 
     /**
@@ -85,13 +85,13 @@ public class Piggie {
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
-    public <R> void send(String path, Object data, Callback<R> callback) {
+    public <R> void execute(String path, Object data, Callback<R> callback) {
         Class dataClass = null;
         if (data != null) {
             dataClass = data.getClass();
         }
 
-        send(path, dataClass, data, callback);
+        execute(path, dataClass, data, callback);
     }
 
     /**
@@ -109,7 +109,7 @@ public class Piggie {
      *           String, or use another data type to convert using Gson.
      */
     @SuppressWarnings("unchecked") // We are checking the type before casting
-    public <D, R> void send(String path, Class<D> dataClass, D data, Callback<R> callback) {
+    public <D, R> void execute(String path, Class<D> dataClass, D data, Callback<R> callback) {
         String json = "";
         if (data != null) {
             if (data instanceof String && isAlreadyJson((String) data)) {
@@ -125,7 +125,7 @@ public class Piggie {
 
             if (responseType instanceof Class) {
                 Class<R> clazz = (Class<R>) responseType;
-                sendAndStore(path, json, clazz, callback);
+                executeAndStore(path, json, clazz, callback);
             } else {
                 throw new IllegalArgumentException("Can't get the Class object from the generic type from the Piggie.Callback");
             }
@@ -138,7 +138,7 @@ public class Piggie {
      * Performs the actual sending of the data to the WebViewWrapper and stores the request to
      * be matched with a response later.
      **/
-    private <R> void sendAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
+    private <R> void executeAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
         // Generate a random key so we can match the response later
         double randomKey;
         do {
@@ -151,7 +151,7 @@ public class Piggie {
         mSentMessageMap.put(randomKey, message);
 
         // Send the request through the javascript layer
-        mWebViewWrapper.js(randomKey, path, json, responseType, callback);
+        mWebViewWrapper.execute(randomKey, path, json, responseType, callback);
     }
 
     /**
@@ -222,9 +222,29 @@ public class Piggie {
     }
 
     /**
+     * Emit an event which can be picked up by native code or in JavaScript.
+     * @param event The event name to emit.
+     */
+    public void emit(String event) {
+        emit(event, null);
+    }
+
+    /**
+     * Emit an event which can be picked up by native code or in JavaScript.
+     * @param event The event name to emit.
+     * @param data The data to emit.
+     */
+    public void emit(String event, String data) {
+        // Send the event for the JavaScript side to handle
+        mWebViewWrapper.emit(event, data);
+        // Distribute the event on the native side of the bridge
+        handleEvent(event, data);
+    }
+
+    /**
      * Used to receive and process incoming JavaScript events
      **/
-    void incomingJavaScriptEvent(String event, String data) {
+    void handleEvent(String event, String data) {
         // Get the list of listeners
         List<EventListener> listeners = mEventListenerMap.get(event);
 

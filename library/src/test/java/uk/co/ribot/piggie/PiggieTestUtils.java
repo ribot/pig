@@ -42,7 +42,7 @@ public class PiggieTestUtils {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.send(path, dataClass, data, new Piggie.Callback<String>() {
+        piggie.execute(path, dataClass, data, new Piggie.Callback<String>() {
             @Override
             public void callback(String error, String response) {
                 received = true;
