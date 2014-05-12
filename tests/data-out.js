@@ -6,7 +6,15 @@ var sinon = require( 'sinon' ),
 describe( 'Data out', function() {
 
   beforeEach( function () {
-    piggie.reset();
+    piggie._reset();
+
+    window = {
+      android: {
+        fail: function() {},
+        success: function() {},
+        event: function() {}
+      }
+    };
   } );
 
 
@@ -21,7 +29,7 @@ describe( 'Data out', function() {
     } );
 
     // Send the request and spy on the success callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -38,7 +46,7 @@ describe( 'Data out', function() {
     } );
 
     // Send the request and spy on the success callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -54,7 +62,7 @@ describe( 'Data out', function() {
     } );
 
     // Send the request and spy on the success callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -73,7 +81,7 @@ describe( 'Data out', function() {
     } );
 
     // Send the request and spy on the success callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -93,7 +101,7 @@ describe( 'Data out', function() {
     } );
 
     // Send the request and spy on the success callback
-    piggie.execute( dummyResponse, 'event' );
+    piggie._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
