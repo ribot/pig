@@ -113,11 +113,21 @@ class WebViewWrapper {
 
     private class JsToNativeInterface {
         @JavascriptInterface
-        public void reply(String key, final String error, final String responseString) {
+        public void success(String key, final String responseString) {
             final Double doubleKey = Double.parseDouble(key);
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPiggie.response(doubleKey, error, responseString);
+                    mPiggie.successResponse(doubleKey, responseString);
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void fail(String key, final String code, final String name, final String message) {
+            final Double doubleKey = Double.parseDouble(key);
+            mMainHandler.post(new Runnable() {
+                public void run() {
+                    mPiggie.errorResponse(doubleKey, code, name, message);
                 }
             });
         }

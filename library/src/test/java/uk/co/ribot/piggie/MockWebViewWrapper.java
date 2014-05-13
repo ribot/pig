@@ -48,11 +48,11 @@ public class MockWebViewWrapper extends WebViewWrapper {
         abstract void handle(String data);
 
         // TODO: Stop multiple responses
-        void error(String error) {
-            mPiggie.response(mKey, error, null);
+        void error(String code, String name, String message) {
+            mPiggie.errorResponse(mKey, code, name, message);
         }
         void send(String response) {
-            mPiggie.response(mKey, null, response);
+            mPiggie.successResponse(mKey, response);
         }
     }
 }
