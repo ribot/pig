@@ -1,6 +1,6 @@
 {
   "name": "piggie",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "main": "app.js",
   "dependencies": {},
   "devDependencies": {

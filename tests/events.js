@@ -1,5 +1,7 @@
 var assert = require( 'assert' ),
-    piggie = require( '../index' );
+    Piggie = require( '../index' );
+
+var piggie = new Piggie();
 
 describe( 'Events', function() {
   beforeEach( function() {
@@ -85,21 +87,11 @@ describe( 'Events', function() {
   it( 'can emit events from native code', function( done ) {
     // Setup the handler
     piggie.on( 'event', function() {
-      assert( true )
+      assert( true );
       done();
     } );
 
-    piggie._nativeEmit( 'event' );
+    piggie.emit( 'event', null, true );
   } );
 
-
-  it( 'throws and error with ore than one data argument', function() {
-    try {
-      piggie.emit( 'event', true, true );
-    } catch ( e ) {
-      return assert( true );
-    }
-
-    assert( false );
-  } );
 } );
