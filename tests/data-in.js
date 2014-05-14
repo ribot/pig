@@ -1,7 +1,7 @@
 var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
     Piggie = require( '../index' ),
-    Response = process.env.PIGGIE_COVERAGE ? require( '../lib-cov/response' ) : require( '../lib/response' );
+    Response = require( '../lib/response' );
 
 var piggie = new Piggie();
 

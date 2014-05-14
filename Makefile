@@ -9,10 +9,4 @@ test:
 test-w:
 	./node_modules/.bin/mocha --reporter $(REPORTER) -w tests/*
 
-test-cov: lib-cov
-	@PIGGIE_COVERAGE=1 $(MAKE) test REPORTER=html-cov > coverage.html
-
-lib-cov:
-	@jscoverage lib lib-cov
-
 .PHONY: test test-w
