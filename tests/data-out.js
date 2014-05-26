@@ -1,14 +1,14 @@
 var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
-    Piggie = require( '../index' ),
+    Pig = require( '../index' ),
     Response = require( '../lib/response' );
 
-var piggie = new Piggie();
+var pig = new Pig();
 
 describe( 'Data out', function() {
 
   beforeEach( function () {
-    piggie._reset();
+    pig._reset();
 
     window = {
       android: {
@@ -26,12 +26,12 @@ describe( 'Data out', function() {
         dummyData = 'data goes in';
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       response.success( dummyData );
     } );
 
     // Send the request and spy on the success callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -43,12 +43,12 @@ describe( 'Data out', function() {
         dummyData = 100;
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       response.success( dummyData );
     } );
 
     // Send the request and spy on the success callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -59,12 +59,12 @@ describe( 'Data out', function() {
         dummyData = true;
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       response.success( dummyData );
     } );
 
     // Send the request and spy on the success callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -78,12 +78,12 @@ describe( 'Data out', function() {
         };
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       response.success( dummyData );
     } );
 
     // Send the request and spy on the success callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );
@@ -98,12 +98,12 @@ describe( 'Data out', function() {
         ];
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       response.success( dummyData );
     } );
 
     // Send the request and spy on the success callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseSuccessSpy.calledWith( dummyData ) );
 
   } );

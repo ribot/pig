@@ -1,11 +1,11 @@
 var assert = require( 'assert' ),
-    Piggie = require( '../index' );
+    Pig = require( '../index' );
 
-var piggie = new Piggie();
+var pig = new Pig();
 
 describe( 'Events', function() {
   beforeEach( function() {
-    piggie._reset();
+    pig._reset();
 
     window = {
       android: {
@@ -19,79 +19,79 @@ describe( 'Events', function() {
 
   it( 'can emit events', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function() {
+    pig.on( 'event', function() {
       done();
     } );
 
-    piggie.emit( 'event' );
+    pig.emit( 'event' );
   } );
 
 
   it( 'can emit events with data strings', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function( data ) {
+    pig.on( 'event', function( data ) {
       assert( data === 'a string' );
       done();
     } );
 
-    piggie.emit( 'event', 'a string' );
+    pig.emit( 'event', 'a string' );
   } );
 
 
   it( 'can emit events with data numbers', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function( data ) {
+    pig.on( 'event', function( data ) {
       assert( data === 1 );
       done();
     } );
 
-    piggie.emit( 'event', 1 );
+    pig.emit( 'event', 1 );
   } );
 
 
   it( 'can emit events with data boolean', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function( data ) {
+    pig.on( 'event', function( data ) {
       assert( data );
       done();
     } );
 
-    piggie.emit( 'event', true );
+    pig.emit( 'event', true );
   } );
 
 
   it( 'can emit events with data object', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function( data ) {
+    pig.on( 'event', function( data ) {
       assert( data.name === "Jake" );
       done();
     } );
 
-    piggie.emit( 'event', {name:"Jake"} );
+    pig.emit( 'event', {name:"Jake"} );
   } );
 
 
   it( 'can emit events with data array', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function( data ) {
+    pig.on( 'event', function( data ) {
       assert( data.length === 2 );
       assert( data[0] === "One" );
       assert( data[1] === "Two" );
       done();
     } );
 
-    piggie.emit( 'event', ["One", "Two"] );
+    pig.emit( 'event', ["One", "Two"] );
   } );
 
 
   it( 'can emit events from native code', function( done ) {
     // Setup the handler
-    piggie.on( 'event', function() {
+    pig.on( 'event', function() {
       assert( true );
       done();
     } );
 
-    piggie.emit( 'event', null, true );
+    pig.emit( 'event', null, true );
   } );
 
 } );

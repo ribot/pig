@@ -1,14 +1,14 @@
 var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
-    Piggie = require( '../index' ),
+    Pig = require( '../index' ),
     Response = require( '../lib/response' );
 
-var piggie = new Piggie();
+var pig = new Pig();
 
 describe( 'Data in', function() {
 
   beforeEach( function () {
-    piggie._reset();
+    pig._reset();
 
     window = {
       android: {
@@ -24,12 +24,12 @@ describe( 'Data in', function() {
     var dummyResponse = new Response( 'dummy-key' );
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert( true );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
 
   } );
 
@@ -39,12 +39,12 @@ describe( 'Data in', function() {
         dummyData = 'data goes in';
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert.strictEqual( data, dummyData );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    pig._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -54,12 +54,12 @@ describe( 'Data in', function() {
         dummyData = 100;
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert.strictEqual( data, dummyData );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    pig._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -68,12 +68,12 @@ describe( 'Data in', function() {
         dummyData = true;
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert.strictEqual( data, dummyData );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    pig._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -85,12 +85,12 @@ describe( 'Data in', function() {
         };
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert.deepEqual( data, dummyData );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    pig._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -103,12 +103,12 @@ describe( 'Data in', function() {
         ];
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) {
+    pig.register( 'event', function ( data, response ) {
       assert.deepEqual( data, dummyData );
     } );
 
     // Send the request
-    piggie._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
+    pig._execute( dummyResponse, 'event', JSON.stringify( dummyData ) );
 
   } );
 
@@ -119,10 +119,10 @@ describe( 'Data in', function() {
         dummyData = '"name:"Big Jeff"}';
 
     // Setup the handler
-    piggie.register( 'event', function ( data, response ) { } );
+    pig.register( 'event', function ( data, response ) { } );
 
     // Send the request and spy on the fail callback
-    piggie._execute( dummyResponse, 'event', dummyData );
+    pig._execute( dummyResponse, 'event', dummyData );
     assert( responseFailSpy.called );
 
   } );

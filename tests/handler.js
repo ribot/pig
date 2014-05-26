@@ -1,14 +1,14 @@
 var sinon = require( 'sinon' ),
     assert = require( 'assert' ),
-    Piggie = require( '../index' ),
+    Pig = require( '../index' ),
     Response = require( '../lib/response' );
 
-var piggie = new Piggie();
+var pig = new Pig();
 
 describe( 'Handler', function() {
 
   beforeEach( function() {
-    piggie._reset();
+    pig._reset();
 
     window = {
       android: {
@@ -25,7 +25,7 @@ describe( 'Handler', function() {
         responseFailSpy = sinon.spy( dummyResponse, 'fail' );
 
     // Test the handler calls the fail callback
-    piggie._execute( dummyResponse, 'event' );
+    pig._execute( dummyResponse, 'event' );
     assert( responseFailSpy.called );
 
   } );
@@ -34,11 +34,11 @@ describe( 'Handler', function() {
   it( 'should error when attempting to register a path twice', function () {
 
     // Setup the first handler
-    piggie.register( 'event', function ( data, response ) { } );
+    pig.register( 'event', function ( data, response ) { } );
 
     assert.throws( function () {
       // Attempt to setup the second handler
-      piggie.register( 'event', function ( data, response ) { } );
+      pig.register( 'event', function ( data, response ) { } );
     } );
 
   } );
