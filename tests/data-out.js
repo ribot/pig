@@ -12,9 +12,9 @@ describe( 'Data out', function() {
 
     window = {
       android: {
-        fail: function() {console.log(arguments)},
-        success: function() {console.log(arguments)},
-        event: function() {console.log(arguments)}
+        fail: function() {},
+        success: function() {},
+        event: function() {}
       }
     };
   } );
