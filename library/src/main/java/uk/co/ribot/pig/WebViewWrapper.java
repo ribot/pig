@@ -1,4 +1,4 @@
-package uk.co.ribot.piggie;
+package uk.co.ribot.pig;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 class WebViewWrapper {
     private static final String TAG = "WebViewWrapper";
 
-    private final Piggie mPiggie;
+    private final Pig mPig;
     private final WebView mWebView;
     private final Handler mMainHandler;
 
@@ -26,8 +26,8 @@ class WebViewWrapper {
     private final Queue<Statement> mPreStartStatementQueue = new ConcurrentLinkedQueue<Statement>();
     private final Queue<Pair<String, String>> mPreStartEventEmitQueue = new ConcurrentLinkedQueue<Pair<String, String>>();
 
-    public WebViewWrapper(Context context, Piggie piggie) {
-        mPiggie = piggie;
+    public WebViewWrapper(Context context, Pig pig) {
+        mPig = pig;
         mWebView = new WebView(context);
         mMainHandler = new Handler(Looper.getMainLooper());
 
@@ -80,8 +80,8 @@ class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public <R> void execute(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
-        execute(new Statement<R>(key, path, jsonData, responseClass, callback));
+    public <R> void execute(Double key, String path, String jsonData, Pig.Callback<R> callback) {
+        execute(new Statement<R>(key, path, jsonData, callback));
     }
 
     private <R> void execute(Statement<R> statement) {
@@ -117,7 +117,7 @@ class WebViewWrapper {
             final Double doubleKey = Double.parseDouble(key);
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPiggie.successResponse(doubleKey, responseString);
+                    mPig.successResponse(doubleKey, responseString);
                 }
             });
         }
@@ -127,7 +127,7 @@ class WebViewWrapper {
             final Double doubleKey = Double.parseDouble(key);
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPiggie.errorResponse(doubleKey, code, name, message);
+                    mPig.errorResponse(doubleKey, code, name, message);
                 }
             });
         }
@@ -136,7 +136,7 @@ class WebViewWrapper {
         public void event(final String type, final String data) {
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPiggie.handleEvent(type, data);
+                    mPig.handleEvent(type, data);
                 }
             });
         }
@@ -144,16 +144,14 @@ class WebViewWrapper {
 
     private class Statement<R> {
         private Double mKey;
-
         private String mPath;
         private String mJsonData;
-        private Class<R> mResponseClass;
-        private Piggie.Callback<R> mCallback;
-        public Statement(Double key, String path, String data, Class<R> responseClass, Piggie.Callback<R> callback) {
+        private Pig.Callback<R> mCallback;
+
+        public Statement(Double key, String path, String data, Pig.Callback<R> callback) {
             mKey = key;
             mPath = path;
             mJsonData = data;
-            mResponseClass = responseClass;
             mCallback = callback;
         }
 
@@ -169,11 +167,7 @@ class WebViewWrapper {
             return mJsonData;
         }
 
-        public Class<R> getResponseClass() {
-            return mResponseClass;
-        }
-
-        public Piggie.Callback<R> getCallback() {
+        public Pig.Callback<R> getCallback() {
             return mCallback;
         }
     }

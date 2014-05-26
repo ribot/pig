@@ -1,4 +1,4 @@
-package uk.co.ribot.piggie;
+package uk.co.ribot.pig;
 
 import android.content.Context;
 import java.util.concurrent.CountDownLatch;
@@ -15,28 +15,28 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest=Config.NONE)
-public class PiggieTest {
+public class PigTest {
     @Test
     public void testSingleton() throws Exception {
         Context context = Robolectric.getShadowApplication().getApplicationContext();
 
-        Piggie piggie1 = Piggie.get(context);
-        Piggie piggie2 = Piggie.get(context);
+        Pig pig1 = Pig.get(context);
+        Pig pig2 = Pig.get(context);
 
-        assertTrue(piggie1 == piggie2);
+        assertTrue(pig1 == pig2);
     }
 
     @Test
     public void testSendString() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("OK");
             }
         });
 
-        PiggieTestUtils.Response response = PiggieTestUtils.sendMockData(piggie, "event", String.class, "Hi");
+        PigTestUtils.Response response = PigTestUtils.sendMockData(pig, "event", String.class, "Hi");
         assertTrue(response.didReceive());
         assertTrue(response.getError() == null);
         assertTrue(response.getResponse().equals("OK"));
@@ -44,15 +44,15 @@ public class PiggieTest {
 
     @Test
     public void testSendNumber() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("OK");
             }
         });
 
-        PiggieTestUtils.Response response = PiggieTestUtils.sendMockData(piggie, "event", Integer.class, 1);
+        PigTestUtils.Response response = PigTestUtils.sendMockData(pig, "event", Integer.class, 1);
         assertTrue(response.didReceive());
         assertTrue(response.getError() == null);
         assertTrue(response.getResponse().equals("OK"));
@@ -60,16 +60,16 @@ public class PiggieTest {
 
     @Test
     public void testSendObject() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("OK");
             }
         });
 
         Dog jakeTheDog = new Dog("Jake", "Tennis Ball");
-        PiggieTestUtils.Response response = PiggieTestUtils.sendMockData(piggie, "event", Dog.class, jakeTheDog);
+        PigTestUtils.Response response = PigTestUtils.sendMockData(pig, "event", Dog.class, jakeTheDog);
         assertTrue(response.didReceive());
         assertTrue(response.getError() == null);
         assertTrue(response.getResponse().equals("OK"));
@@ -80,9 +80,9 @@ public class PiggieTest {
     private String stringReceivedResponse;
     @Test
     public void testReceiveString() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("A String");
             }
@@ -94,7 +94,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.execute("event", null, null, new Piggie.Callback<String>() {
+        pig.execute("event", new Pig.Callback<String>() {
             @Override
             public void onSuccess(String response) {
                 stringReceived = true;
@@ -124,9 +124,9 @@ public class PiggieTest {
     private Integer numberReceivedResponse;
     @Test
     public void testReceiveNumber() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("1");
             }
@@ -138,7 +138,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.execute("event", null, null, new Piggie.Callback<Integer>() {
+        pig.execute("event", new Pig.Callback<Integer>() {
             @Override
             public void onSuccess(Integer response) {
                 numberReceived = true;
@@ -168,9 +168,9 @@ public class PiggieTest {
     private Dog objectReceivedResponse;
     @Test
     public void testReceiveObject() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
-        PiggieTestUtils.addMockHandler(piggie, new MockWebViewWrapper.Handler(piggie) {
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
             public void handle(String data) {
                 send("{\"name\":\"Bob\",\"toy\":\"Ball\"}");
             }
@@ -182,7 +182,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.execute("event", null, null, new Piggie.Callback<Dog>() {
+        pig.execute("event", new Pig.Callback<Dog>() {
             @Override
             public void onSuccess(Dog response) {
                 objectReceived = true;
@@ -213,7 +213,7 @@ public class PiggieTest {
     private String emitNoData_data;
     @Test
     public void testEmitEventNoData() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
         emitNoData_emited = false;
         emitNoData_event = null;
@@ -221,7 +221,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.addListener("event", new Piggie.EventListener() {
+        pig.addListener("event", new Pig.EventListener() {
             @Override
             public void onEvent(String event, String data) {
                 emitNoData_emited = true;
@@ -231,7 +231,7 @@ public class PiggieTest {
             }
         });
 
-        piggie.emit("event");
+        pig.emit("event");
 
         lock.await(2000, TimeUnit.MILLISECONDS);
 
@@ -245,7 +245,7 @@ public class PiggieTest {
     private String emitData_data;
     @Test
     public void testEmitEventData() throws Exception {
-        Piggie piggie = PiggieTestUtils.getMockedPiggie();
+        Pig pig = PigTestUtils.getMockedPiggie();
 
         emitData_emited = false;
         emitData_event = null;
@@ -253,7 +253,7 @@ public class PiggieTest {
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.addListener("event", new Piggie.EventListener() {
+        pig.addListener("event", new Pig.EventListener() {
             @Override
             public void onEvent(String event, String data) {
                 emitData_emited = true;
@@ -263,7 +263,7 @@ public class PiggieTest {
             }
         });
 
-        piggie.emit("event", "data");
+        pig.emit("event", "data");
 
         lock.await(2000, TimeUnit.MILLISECONDS);
 

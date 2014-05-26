@@ -1,10 +1,11 @@
-package uk.co.ribot.piggie;
+package uk.co.ribot.pig;
 
 import android.content.Context;
 import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -14,49 +15,49 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Piggie is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
+ * Pig is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
  */
-public class Piggie {
-    private static final String TAG = "Piggie";
+public class Pig {
+    private static final String TAG = "Pig";
 
-    // The static singleton instance of Piggie
-    private static Piggie sPiggie;
+    // The static singleton instance of Pig
+    private static Pig sPig;
     private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
     private final Map<String, List<EventListener>> mEventListenerMap = new HashMap<String, List<EventListener>>();
 
     /**
-     * Get the singleton instance of Piggie.
-     * @param context A Context used to create Piggie with.
-     * @return A singleton instance of Piggie.
+     * Get the singleton instance of Pig.
+     * @param context A Context used to create Pig with.
+     * @return A singleton instance of Pig.
      */
-    public static Piggie get(Context context) {
-        if (sPiggie == null) {
-            sPiggie = new Piggie(context);
+    public static Pig get(Context context) {
+        if (sPig == null) {
+            sPig = new Pig(context);
         }
-        return sPiggie;
+        return sPig;
     }
 
-    // An instance of the WebViewWrapper used to hold and communicate with piggie-js running in a WebView
+    // An instance of the WebViewWrapper used to hold and communicate with pig-js running in a WebView
     private final WebViewWrapper mWebViewWrapper;
     // An instance of Gson used to convert from a data object to JSON
     private final Gson mGson;
 
     /**
-     * Creates a new instance of Piggie.
-     * @param context The Context used to create Piggie with.
+     * Creates a new instance of Pig.
+     * @param context The Context used to create Pig with.
      */
-    private Piggie(Context context) {
+    private Pig(Context context) {
         mWebViewWrapper = new WebViewWrapper(context, this);
         mGson = new Gson();
     }
 
     /**
-     * Creates a new instance of Piggie with a given WebViewWrapper
+     * Creates a new instance of Pig with a given WebViewWrapper
      * @hide
-     * @param context The Context used to create Piggie with.
+     * @param context The Context used to create Pig with.
      * @param webViewWrapper The instance of WebViewWrapper to use
      */
-    Piggie(Context context, WebViewWrapper webViewWrapper) {
+    Pig(Context context, WebViewWrapper webViewWrapper) {
         mWebViewWrapper = webViewWrapper;
         mGson = new Gson();
     }
@@ -66,18 +67,18 @@ public class Piggie {
     /***********/
 
     /**
-     * Send a message to Piggie with a given Callback.
+     * Send a message to Pig with a given Callback.
      * @param path The path to call in JavaScript.
      * @param callback The callback you want to receive the response back to. May be null.
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
     public <R> void execute(String path, Callback<R> callback) {
-        execute(path, null, callback);
+        execute(path, (Object) null, callback);
     }
 
     /**
-     * Send a message to Piggie with a given Callback.
+     * Send a message to Pig with a given Callback.
      * @param path The path to call in JavaScript.
      * @param data The data you want to pass to the JavaScript handler. Maybe by null, a valid JSON String or
      *             another data Object to convert with Gson.
@@ -95,7 +96,7 @@ public class Piggie {
     }
 
     /**
-     * Send a message to Piggie with a given Callback.
+     * Send a message to Pig with a given Callback.
      *
      * You would use the method over the one without dataType if you want to provide a generic data type
      * for Gson to convert.
@@ -105,40 +106,107 @@ public class Piggie {
      *             another data Object to convert with Gson.
      * @param dataClass The Class of data you are providing.
      * @param callback The callback you want to receive the response back to. May be null.
+     * @param <D> The data type you are passing in.
      * @param <R> The type of response you are expecting. Use String to get the response as a JSON
      *           String, or use another data type to convert using Gson.
      */
     @SuppressWarnings("unchecked") // We are checking the type before casting
-    public <D, R> void execute(String path, Class<D> dataClass, D data, Callback<R> callback) {
-        String json = "";
-        if (data != null) {
-            if (data instanceof String && isAlreadyJson((String) data)) {
-                json = (String) data;
-            } else {
-                json = mGson.toJson(data, dataClass);
-            }
-        }
-
+    public <D, R> void execute(String path, Type dataClass, D data, Callback<R> callback) {
         Type type = callback.getClass().getGenericInterfaces()[0];
         if (type instanceof ParameterizedType) {
             Type responseType = ((ParameterizedType) type).getActualTypeArguments()[0];
 
             if (responseType instanceof Class) {
-                Class<R> clazz = (Class<R>) responseType;
-                executeAndStore(path, json, clazz, callback);
+                execute(path, dataClass, data, responseType, callback);
             } else {
-                throw new IllegalArgumentException("Can't get the Class object from the generic type from the Piggie.Callback");
+                throw new IllegalArgumentException("Can't get the Class object from the generic type from the Pig.Callback");
             }
         } else {
-            throw new IllegalArgumentException("Can't get the generic type argument from the Piggie.Callback");
+            throw new IllegalArgumentException("Can't get the generic type argument from the Pig.Callback");
         }
     }
 
     /**
-     * Performs the actual sending of the data to the WebViewWrapper and stores the request to
-     * be matched with a response later.
-     **/
-    private <R> void executeAndStore(String path, String json, Class<R> responseType, Callback<R> callback) {
+     * Send a message to Pig with a given Callback.
+     *
+     * You would use this method if you need to pass in a response type but do not need to pass in any data.
+     *
+     * @param path The path to call in JavaScript.
+     * @param responseType The Type of data you are expecting.
+     * @param callback The callback you want to receive the response back to. May be null.
+     * @param <R> The type of response you are expecting. Use String to get the response as a JSON
+     *           String, or use another data type to convert using Gson.
+     */
+    public <R> void execute(String path, Type responseType, Callback<R> callback) {
+        execute(path, (String) null, responseType, callback);
+    }
+
+    /**
+     * Send a message to Pig with a given Callback.
+     *
+     * You would use this method if you need to pass in a response type and some data with a non-generic type..
+     *
+     * @param path The path to call in JavaScript.
+     * @param responseType The Type of data you are expecting.
+     * @param callback The callback you want to receive the response back to. May be null.
+     * @param <R> The type of response you are expecting. Use String to get the response as a JSON
+     *           String, or use another data type to convert using Gson.
+     */
+    public <D, R> void execute(String path, D data, Type responseType, Callback<R> callback) {
+        Class dataClass = null;
+        if (data != null) {
+            dataClass = data.getClass();
+        }
+
+        execute(path, dataClass, data, responseType, callback);
+    }
+
+    /**
+     * Send a message to Pig with a given Callback.
+     *
+     * You would use this method if you need to pass in a response type.
+     *
+     * @param path The path to call in JavaScript.
+     * @param dataType The Type of data you are providing.
+     * @param data The data you want to pass to the JavaScript handler. Maybe by null, a valid JSON String or
+     *             another data Object to convert with Gson.
+     * @param responseType The Type of data you are expecting.
+     * @param callback The callback you want to receive the response back to. May be null.
+     * @param <D> The data type you are passing in.
+     * @param <R> The type of response you are expecting. Use String to get the response as a JSON
+     *           String, or use another data type to convert using Gson.
+     */
+    public <D, R> void execute(String path, Type dataType, D data, Type responseType, Callback<R> callback) {
+        String json = "";
+        if (data != null) {
+            if (data instanceof String && isAlreadyJson((String) data)) {
+                json = (String) data;
+            } else {
+                json = mGson.toJson(data, dataType);
+            }
+        }
+
+        execute(path, json, responseType, callback);
+    }
+
+    /**
+     * Send a message to Pig with a given Callback.
+     *
+     * You would use this method if you have already got a JSON encoded string.
+     *
+     * @param path The path to call in JavaScript.
+     * @param json The json encoded data to pass to JavaScript.
+     * @param responseType The Type of data you are expecting.
+     * @param callback The callback you want to receive the response back to. May be null.
+     * @param <R> The type of response you are expecting. Use String to get the response as a JSON
+     *           String, or use another data type to convert using Gson.
+     */
+    public <R> void execute(String path, String json, Type responseType, Callback<R> callback) {
+        // Make json an empty String if no data is passed in
+        if (json == null) {
+            json = "";
+        }
+
         // Generate a random key so we can match the response later
         double randomKey;
         do {
@@ -151,7 +219,7 @@ public class Piggie {
         mSentMessageMap.put(randomKey, message);
 
         // Send the request through the javascript layer
-        mWebViewWrapper.execute(randomKey, path, json, responseType, callback);
+        mWebViewWrapper.execute(randomKey, path, json, callback);
     }
 
     /**
@@ -162,12 +230,12 @@ public class Piggie {
         Message message = mSentMessageMap.remove(key);
         // TODO: Check for null message from the map. Shouldn't happen though
 
-        final Piggie.Callback callback = message.getCallback();
-        final Class responseClass = message.getResponseType();
+        final Pig.Callback callback = message.getCallback();
+        final Type responseClass = message.getResponseType();
 
         if (callback != null) {
             Object response;
-            if (responseClass == String.class) {
+            if (responseClass == new TypeToken<String>(){}.getType()) {
                 response = responseString;
             } else {
                 response = mGson.fromJson(responseString, responseClass);
@@ -186,7 +254,7 @@ public class Piggie {
         Message message = mSentMessageMap.remove(key);
         // TODO: Check for null message from the map. Shouldn't happen though
 
-        final Piggie.Callback callback = message.getCallback();
+        final Pig.Callback callback = message.getCallback();
         if (callback != null) {
             callback.onError(code, name, errorMessage);
         } else {
@@ -302,7 +370,7 @@ public class Piggie {
     }
 
     /**
-     * A callback used to get a response from a Piggie JavaScript handler.
+     * A callback used to get a response from a Pig JavaScript handler.
      * @param <R> The type of response you are expecting in the response.
      */
     public interface Callback<R> {
@@ -325,9 +393,9 @@ public class Piggie {
     private class Message<R> {
         private String mPath;
 
-        private Class<R> mResponseType;
+        private Type mResponseType;
         private Callback<R> mCallback;
-        private Message(String path, Class<R> responseType, Callback<R> callback) {
+        private Message(String path, Type responseType, Callback<R> callback) {
             this.mPath = path;
             this.mResponseType = responseType;
             this.mCallback = callback;
@@ -337,7 +405,7 @@ public class Piggie {
             return mPath;
         }
 
-        public Class<R> getResponseType() {
+        public Type getResponseType() {
             return mResponseType;
         }
 

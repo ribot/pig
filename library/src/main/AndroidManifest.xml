@@ -2,5 +2,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="uk.co.ribot.piggie">
 
-    <application android:name=".PiggieApplication"></application>
+    <application android:name="uk.co.ribot.pig.PigApplication"></application>
 </manifest>

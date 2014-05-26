@@ -1,24 +1,24 @@
-package uk.co.ribot.piggie;
+package uk.co.ribot.pig;
 
 import android.content.Context;
-import android.util.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class MockWebViewWrapper extends WebViewWrapper {
     private final Map<String, Handler> mMockHandlers = new HashMap<String, Handler>();
-    private Piggie mPiggie;
+    private Pig mPig;
 
     public MockWebViewWrapper(Context context) {
         super(context, null);
     }
 
-    public void setPiggie(Piggie piggie) {
-        mPiggie = piggie;
+    public void setPiggie(Pig pig) {
+        mPig = pig;
     }
 
     @Override
-    public <R> void execute(Double key, String path, String jsonData, Class<R> responseClass, Piggie.Callback<R> callback) {
+    public <R> void execute(Double key, String path, String jsonData, Pig.Callback<R> callback) {
         Handler handler = mMockHandlers.get(path);
         if (handler != null) {
             handler.doHandler(key, jsonData);
@@ -34,10 +34,10 @@ public class MockWebViewWrapper extends WebViewWrapper {
 
     public static abstract class Handler {
         private Double mKey;
-        private final Piggie mPiggie;
+        private final Pig mPig;
 
-        public Handler(Piggie piggie) {
-            mPiggie = piggie;
+        public Handler(Pig pig) {
+            mPig = pig;
         }
 
         public void doHandler(Double key, String data) {
@@ -49,10 +49,10 @@ public class MockWebViewWrapper extends WebViewWrapper {
 
         // TODO: Stop multiple responses
         void error(String code, String name, String message) {
-            mPiggie.errorResponse(mKey, code, name, message);
+            mPig.errorResponse(mKey, code, name, message);
         }
         void send(String response) {
-            mPiggie.successResponse(mKey, response);
+            mPig.successResponse(mKey, response);
         }
     }
 }

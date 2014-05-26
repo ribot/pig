@@ -1,4 +1,4 @@
-package uk.co.ribot.piggie;
+package uk.co.ribot.pig;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
@@ -6,7 +6,7 @@ import android.content.Context;
 
 import org.robolectric.Robolectric;
 
-public class PiggieTestUtils {
+public class PigTestUtils {
     private static boolean received = false;
     private static String receivedError;
     private static String receivedResponse;
@@ -14,20 +14,20 @@ public class PiggieTestUtils {
     /**
      * Gets a new instance og Piggie with a mocked WebViewWrapper
      **/
-    public static Piggie getMockedPiggie() throws Exception {
+    public static Pig getMockedPiggie() throws Exception {
         Context context = Robolectric.getShadowApplication().getApplicationContext();
         MockWebViewWrapper wrapper = new MockWebViewWrapper(context);
-        Piggie piggie = new Piggie(context, wrapper);
-        wrapper.setPiggie(piggie);
+        Pig pig = new Pig(context, wrapper);
+        wrapper.setPiggie(pig);
 
-        return piggie;
+        return pig;
     }
 
     /**
      * Adds a new mock handler to the instance of Piggie
      **/
-    public static void addMockHandler(Piggie piggie, MockWebViewWrapper.Handler handler) throws Exception {
-        MockWebViewWrapper wrapper = (MockWebViewWrapper) piggie.getWebViewWrapper();
+    public static void addMockHandler(Pig pig, MockWebViewWrapper.Handler handler) throws Exception {
+        MockWebViewWrapper wrapper = (MockWebViewWrapper) pig.getWebViewWrapper();
         wrapper.addMockHandler("event", handler);
     }
 
@@ -35,14 +35,14 @@ public class PiggieTestUtils {
      * Send some data to the given mocked piggie and pass back the response syncronassly.
      * Check received is true to make sure the 2s timeout wasn't hit
      **/
-    public static <D> Response sendMockData(Piggie piggie, String path, Class<D> dataClass, D data) throws Exception {
+    public static <D> Response sendMockData(Pig pig, String path, Class<D> dataClass, D data) throws Exception {
         received = false;
         receivedError = null;
         receivedResponse = null;
 
         final CountDownLatch lock = new CountDownLatch(1);
 
-        piggie.execute(path, dataClass, data, new Piggie.Callback<String>() {
+        pig.execute(path, dataClass, data, new Pig.Callback<String>() {
             @Override
             public void onSuccess(String response) {
                 received = true;
