@@ -91,7 +91,7 @@ class WebViewWrapper {
         }
 
         String jsonData = statement.getJsonData().replace("\"", "\\\"");
-        String jsUrl = "javascript:window.piggie._execute(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
+        String jsUrl = "javascript:window.pig._execute(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
     }
 
@@ -107,7 +107,7 @@ class WebViewWrapper {
 
         String jsonType = event.replace("\"", "\\\"");
         String jsonData = data.replace("\"", "\\\"");
-        String jsUrl = "javascript:window.piggie.emit(\"" + jsonType + "\", \"" + jsonData + "\", true)";
+        String jsUrl = "javascript:window.pig.emit(\"" + jsonType + "\", \"" + jsonData + "\", true)";
         mWebView.loadUrl(jsUrl);
     }
 
