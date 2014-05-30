@@ -1,0 +1,28 @@
+{
+  "name": "pig",
+  "version": "0.1.2",
+  "main": "app.js",
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "sinon": "~1.9.1"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "make test"
+  },
+  "author": "ribot",
+  "contributors": [
+    {
+      "name": "Matt Oakes",
+      "email": "matt@ribot.co.uk"
+    },
+    {
+      "name": "Stefan Pearson",
+      "email": "stefan@ribot.co.uk"
+    }
+  ],
+  "engines": {
+    "node": "0.10.x"
+  }
+}
