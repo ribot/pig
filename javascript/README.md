@@ -1,5 +1,3 @@
-# Pig (in the middle)
+# Pig JavaScript
 
-**Pig is currently under heavy development/experimentation and should not be used by anyone!**
-
-Pig aims to be the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
+This is the JavaScript part of Pig which acts as a thin layer between your JavaScript application logic and your native UI code.
