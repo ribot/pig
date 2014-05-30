@@ -232,11 +232,12 @@ public class Pig {
 
         final Pig.Callback callback = message.getCallback();
         final Type responseClass = message.getResponseType();
-
         if (callback != null) {
             Object response;
-            if (responseClass == new TypeToken<String>(){}.getType()) {
+            if (responseClass.equals(String.class)) {
                 response = responseString;
+            } else if (responseClass.equals(Void.class)) {
+                response = null;
             } else {
                 response = mGson.fromJson(responseString, responseClass);
             }
