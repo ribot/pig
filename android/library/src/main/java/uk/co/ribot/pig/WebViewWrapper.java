@@ -38,6 +38,10 @@ class WebViewWrapper {
     private void initWebView() {
         // Enable JavaScript
         mWebView.getSettings().setJavaScriptEnabled(true);
+        // Enable DOM storage API
+        mWebView.getSettings().setDomStorageEnabled(true);
+        // Enable Database API 
+        mWebView.getSettings().setDatabaseEnabled(true);
 
         // Set the web view client to receive callbacks
         mWebView.setWebViewClient(new WebViewClient() {
