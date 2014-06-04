@@ -8,10 +8,10 @@ import com.google.gson.JsonSyntaxException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Pig is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
@@ -21,8 +21,8 @@ public class Pig {
 
     // The static singleton instance of Pig
     private static Pig sPig;
-    private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
-    private final Map<String, Set<EventListener>> mEventListenerMap = new HashMap<String, Set<EventListener>>();
+    private final Map<Double, Message<?>> mSentMessageMap = new ConcurrentHashMap<Double, Message<?>>();
+    private final Map<String, Set<EventListener>> mEventListenerMap = new ConcurrentHashMap<String, Set<EventListener>>();
 
     /**
      * Get the singleton instance of Pig.
@@ -271,7 +271,7 @@ public class Pig {
      * @param event The event to listen for.
      * @param listener The listener
      */
-    public void addListener(String event, EventListener listener) {
+    public synchronized void addListener(String event, EventListener listener) {
         // Get and possibly setup the list of listeners
         Set<EventListener> currentListeners = mEventListenerMap.get(event);
         if (currentListeners == null) {
@@ -288,7 +288,7 @@ public class Pig {
      * @param event The event to stop listening for.
      * @param listener The listener
      */
-    public void removeListener(String event, EventListener listener) {
+    public synchronized void removeListener(String event, EventListener listener) {
         // Get and possibly setup the list of listeners
         Set<EventListener> currentListener = mEventListenerMap.get(event);
         if (currentListener == null) {
