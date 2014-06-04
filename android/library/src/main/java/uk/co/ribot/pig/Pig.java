@@ -5,14 +5,13 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Pig is the bridge in the middle of your native mobile UI and a some shared JavaScript business logic.
@@ -23,7 +22,7 @@ public class Pig {
     // The static singleton instance of Pig
     private static Pig sPig;
     private final HashMap<Double, Message<?>> mSentMessageMap = new HashMap<Double, Message<?>>();
-    private final Map<String, List<EventListener>> mEventListenerMap = new HashMap<String, List<EventListener>>();
+    private final Map<String, Set<EventListener>> mEventListenerMap = new HashMap<String, Set<EventListener>>();
 
     /**
      * Get the singleton instance of Pig.
@@ -274,9 +273,9 @@ public class Pig {
      */
     public void addListener(String event, EventListener listener) {
         // Get and possibly setup the list of listeners
-        List<EventListener> currentListeners = mEventListenerMap.get(event);
+        Set<EventListener> currentListeners = mEventListenerMap.get(event);
         if (currentListeners == null) {
-            currentListeners = new ArrayList<EventListener>();
+            currentListeners = new HashSet<EventListener>();
         }
 
         // Add the listener to the list and add it back to the map
@@ -291,9 +290,9 @@ public class Pig {
      */
     public void removeListener(String event, EventListener listener) {
         // Get and possibly setup the list of listeners
-        List<EventListener> currentListener = mEventListenerMap.get(event);
+        Set<EventListener> currentListener = mEventListenerMap.get(event);
         if (currentListener == null) {
-            currentListener = new ArrayList<EventListener>();
+            currentListener = new HashSet<EventListener>();
         }
 
         // Remove the listener from the list
@@ -326,7 +325,7 @@ public class Pig {
      **/
     void handleEvent(String event, String data) {
         // Get the list of listeners
-        List<EventListener> listeners = mEventListenerMap.get(event);
+        Set<EventListener> listeners = mEventListenerMap.get(event);
 
         // Loop through and execute all event listeners
         if (listeners != null) {
