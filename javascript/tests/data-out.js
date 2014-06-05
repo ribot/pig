@@ -108,4 +108,68 @@ describe( 'Data out', function() {
 
   } );
 
+  it( 'should error when attempting to call success twice', function () {
+    var dummyResponse = new Response( 'dummy-key' );
+
+    // Setup the first handler
+    pig.register( 'event', function ( data, response ) {
+      response.success( true );
+
+      assert.throws( function () {
+        response.success( true );
+      } );
+    } );
+
+    pig._execute( dummyResponse, 'event' );
+
+  } );
+
+  it( 'should error when attempting to call fail twice', function () {
+    var dummyResponse = new Response( 'dummy-key' );
+
+    // Setup the first handler
+    pig.register( 'event', function ( data, response ) {
+      response.fail( true );
+
+      assert.throws( function () {
+        response.fail( true );
+      } );
+    } );
+
+    pig._execute( dummyResponse, 'event' );
+
+  } );
+
+  it( 'should error when attempting to call success and then fail', function () {
+    var dummyResponse = new Response( 'dummy-key' );
+
+    // Setup the first handler
+    pig.register( 'event', function ( data, response ) {
+      response.success( true );
+
+      assert.throws( function () {
+        response.fail( true );
+      } );
+    } );
+
+    pig._execute( dummyResponse, 'event' );
+
+  } );
+
+  it( 'should error when attempting to call fial and then success', function () {
+    var dummyResponse = new Response( 'dummy-key' );
+
+    // Setup the first handler
+    pig.register( 'event', function ( data, response ) {
+      response.fail( true );
+
+      assert.throws( function () {
+        response.success( true );
+      } );
+    } );
+
+    pig._execute( dummyResponse, 'event' );
+
+  } );
+
 } );
