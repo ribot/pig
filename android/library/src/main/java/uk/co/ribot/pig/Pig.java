@@ -67,6 +67,14 @@ public class Pig {
     /***********/
 
     /**
+     * Send a message to Pig with no callback.
+     * @param path The path to call in JavaScript.
+     */
+    public void execute(String path) {
+        execute(path, (String) null, (Type) null, (Callback) null);
+    }
+
+    /**
      * Send a message to Pig with a given Callback.
      * @param path The path to call in JavaScript.
      * @param callback The callback you want to receive the response back to. May be null.
@@ -207,19 +215,22 @@ public class Pig {
             json = "";
         }
 
-        // Generate a random key so we can match the response later
         double randomKey;
-        do {
-            randomKey = Math.round(Math.random() * 40000);
-        } while (mSentMessageMap.containsKey(randomKey));
+        // Add the callback to the map, if we have one
+        if (callback != null) {
+            // Generate a random key so we can get the callback later
+            do {
+                randomKey = Math.round(Math.random() * 40000);
+            } while (mSentMessageMap.containsKey(randomKey));
 
-        // Store the callback for the response later
-        // TODO: Do we need to do this if callback == null?
-        Message<R> message = new Message<R>(path, responseType, callback);
-        mSentMessageMap.put(randomKey, message);
+            Message<R> message = new Message<R>(path, responseType, callback);
+            mSentMessageMap.put(randomKey, message);
+        } else {
+            randomKey = -1;
+        }
 
         // Send the request through the javascript layer
-        mWebViewWrapper.execute(randomKey, path, json, callback);
+        mWebViewWrapper.execute(randomKey, path, json);
     }
 
     /**
@@ -228,8 +239,10 @@ public class Pig {
     // TODO: Find a way to avoid unchecked operations
     void successResponse(Double key, String responseString) {
         Message message = mSentMessageMap.remove(key);
-        // TODO: Check for null message from the map. Shouldn't happen though
+        // Just in case we don't have a message for that key. This shouldn't happen
+        if (message == null) return;
 
+        // Parse the response and call the callback
         final Pig.Callback callback = message.getCallback();
         final Type responseClass = message.getResponseType();
         if (callback != null) {
@@ -243,7 +256,7 @@ public class Pig {
             }
             callback.onSuccess(response);
         } else {
-            Log.w(TAG, "No success callback for key: " + key);
+            Log.wtf(TAG, "No callback was null in non-null message for key: " + key);
         }
     }
 
@@ -253,13 +266,15 @@ public class Pig {
     // TODO: Find a way to avoid unchecked operations
     void errorResponse(Double key, String code, String name, String errorMessage) {
         Message message = mSentMessageMap.remove(key);
-        // TODO: Check for null message from the map. Shouldn't happen though
+        // Just in case we don't have a message for that key. This shouldn't happen
+        if (message == null) return;
 
+        // Send the error to the error callback
         final Pig.Callback callback = message.getCallback();
         if (callback != null) {
             callback.onError(code, name, errorMessage);
         } else {
-            Log.w(TAG, "No error callback for key: " + key);
+            Log.wtf(TAG, "No callback was null in non-null message for key: " + key);
         }
     }
 

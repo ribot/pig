@@ -208,6 +208,28 @@ public class PigTest {
         assertTrue(objectReceivedResponse.getToy().equals("Ball"));
     }
 
+    private boolean noCallbackReceived = false;
+    @Test
+    public void testNoCallback() throws Exception {
+        Pig pig = PigTestUtils.getMockedPiggie();
+
+        final CountDownLatch lock = new CountDownLatch(1);
+        noCallbackReceived = false;
+
+        PigTestUtils.addMockHandler(pig, new MockWebViewWrapper.Handler(pig) {
+            public void handle(String data) {
+                noCallbackReceived = true;
+                lock.countDown();
+            }
+        });
+
+        pig.execute("event");
+
+        lock.await(2000, TimeUnit.MILLISECONDS);
+
+        assertTrue(noCallbackReceived);
+    }
+
     private boolean emitNoData_emited = false;
     private String emitNoData_event;
     private String emitNoData_data;

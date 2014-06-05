@@ -80,8 +80,8 @@ class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public <R> void execute(Double key, String path, String jsonData, Pig.Callback<R> callback) {
-        execute(new Statement<R>(key, path, jsonData, callback));
+    public <R> void execute(Double key, String path, String jsonData) {
+        execute(new Statement<R>(key, path, jsonData));
     }
 
     private <R> void execute(Statement<R> statement) {
@@ -146,13 +146,11 @@ class WebViewWrapper {
         private Double mKey;
         private String mPath;
         private String mJsonData;
-        private Pig.Callback<R> mCallback;
 
-        public Statement(Double key, String path, String data, Pig.Callback<R> callback) {
+        public Statement(Double key, String path, String data) {
             mKey = key;
             mPath = path;
             mJsonData = data;
-            mCallback = callback;
         }
 
         public Double getKey() {
@@ -165,10 +163,6 @@ class WebViewWrapper {
 
         public String getJsonData() {
             return mJsonData;
-        }
-
-        public Pig.Callback<R> getCallback() {
-            return mCallback;
         }
     }
 }
