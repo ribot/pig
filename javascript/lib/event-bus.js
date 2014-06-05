@@ -10,15 +10,20 @@ PigEvents.prototype = new events.EventEmitter();
 /**
  * Emit override
  */
-PigEvents.prototype.emit = function emit( type, data, fromNative ) {
+PigEvents.prototype.emit = function emit( name, data, fromNative ) {
+  var json = ( data ? JSON.stringify( data ) : '' );
+
+  if ( typeof name !== 'string' ) {
+    throw Error( 'An event name must be defined' );
+  }
 
   fromNative = ( fromNative === true ) || false;
 
   if ( !fromNative ) {
-    nativeInterface.event( type, data );
+    nativeInterface.event( name, json );
   }
 
-  events.EventEmitter.prototype.emit.call( this, type, data );
+  events.EventEmitter.prototype.emit.call( this, name, data );
 
 };
 

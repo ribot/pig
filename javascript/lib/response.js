@@ -15,9 +15,11 @@ Response.prototype = {
    * Native party failure callback
    */
   fail: function fail( error, code ) {
+    error = error || new Error();
+    code = code || '';
 
-    if ( this.key != -1 ) {
-      nativeInterface.fail( this.key, ( code || null ), error.name, error.message );
+    if ( this.key !== -1 ) {
+      nativeInterface.fail( this.key, code, error.name, error.message );
     }
 
     _preventRecurrence.call( this );
@@ -28,9 +30,10 @@ Response.prototype = {
    * Native party success callback
    */
   success: function success( data ) {
+    var json = ( data ? JSON.stringify( data ) : '' );
 
-    if ( this.key != -1 ) {
-      nativeInterface.success( this.key, JSON.stringify( data ) );
+    if ( this.key !== -1 ) {
+      nativeInterface.success( this.key, json );
     }
 
     _preventRecurrence.call( this );

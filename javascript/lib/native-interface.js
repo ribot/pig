@@ -1,10 +1,11 @@
-var global = global || {};
-var window = window || {};
+var global = global || {},
+    window = window || {},
+    noop = function noop () {};
 
 var nativeInterface = window.android || global.ios || {
-  event: console.log,
-  fail: console.log,
-  success: console.log
+  event: noop,
+  fail: noop,
+  success: noop
 };
 
 // Exports

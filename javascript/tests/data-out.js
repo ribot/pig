@@ -156,7 +156,7 @@ describe( 'Data out', function() {
 
   } );
 
-  it( 'should error when attempting to call fial and then success', function () {
+  it( 'should error when attempting to call fail and then success', function () {
     var dummyResponse = new Response( 'dummy-key' );
 
     // Setup the first handler
