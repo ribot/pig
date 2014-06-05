@@ -1,3 +1,6 @@
+// Dependencies
+var nativeInterface = require( './native-interface' );
+
 /**
  * Response constructor
  */
@@ -14,15 +17,10 @@ Response.prototype = {
   fail: function fail( error, code ) {
 
     if ( this.key != -1 ) {
-      // Android
-      if ( typeof window != "undefined" && window.android ) {
-        window.android.fail( this.key, ( code || null ), error.name, error.message );
-      }
-      // iOS
-      // TODO
+      nativeInterface.fail( this.key, ( code || null ), error.name, error.message );
     }
 
-    preventRecurrence.call( this );
+    _preventRecurrence.call( this );
 
   },
 
@@ -32,15 +30,10 @@ Response.prototype = {
   success: function success( data ) {
 
     if ( this.key != -1 ) {
-      // Android
-      if ( typeof window != "undefined" && window.android ) {
-        window.android.success( this.key, JSON.stringify( data ) );
-      }
-      // iOS
-      // TODO
+      nativeInterface.success( this.key, JSON.stringify( data ) );
     }
 
-    preventRecurrence.call( this );
+    _preventRecurrence.call( this );
 
   }
 
@@ -49,11 +42,13 @@ Response.prototype = {
 /**
  * Replaces the success and fail function in this response object with a
  * function which throws and Error.
- **/
-function preventRecurrence () {
-  this.fail = this.success = function () {
+ */
+function _preventRecurrence() {
+
+  this.fail = this.success = function recurrenceHandler() {
     throw new Error( 'Cannot respond more than once using the same response object.' );
-  }
+  };
+
 }
 
 // Exports

@@ -1,5 +1,6 @@
 // Dependencies
-var events = require( 'events' );
+var events = require( 'events' ),
+    nativeInterface = require( './native-interface' );
 
 var PigEvents = function PigEvents() {};
 
@@ -14,12 +15,7 @@ PigEvents.prototype.emit = function emit( type, data, fromNative ) {
   fromNative = ( fromNative === true ) || false;
 
   if ( !fromNative ) {
-    // Android
-    if ( typeof window != "undefined" && window.android ) {
-      window.android.event( type, data );
-    }
-    // iOS
-    // TODO
+    nativeInterface.event( type, data );
   }
 
   events.EventEmitter.prototype.emit.call( this, type, data );
