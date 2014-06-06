@@ -8,7 +8,6 @@
     "sinon": "~1.9.1"
   },
   "scripts": {
-    "start": "node app.js",
     "test": "make test"
   },
   "author": "ribot",
