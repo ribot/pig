@@ -1,6 +1,7 @@
 var global = global || {};
+var window = window || {};
 
-var nativeInterface = global.android || global.ios || {
+var nativeInterface = window.android || global.ios || {
   event: console.log,
   fail: console.log,
   success: console.log
