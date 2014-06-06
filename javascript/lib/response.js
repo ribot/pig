@@ -15,7 +15,13 @@ Response.prototype = {
    * Native party failure callback
    */
   fail: function fail( error, code ) {
-    error = error || new Error();
+
+    if ( typeof error == 'string' ) {
+      error = new Error( error );
+    } else if ( typeof error == 'undefined' || typeof error == 'null' ) {
+      error = new Error( '' );
+    }
+
     code = code || '';
 
     if ( this.key !== -1 ) {
