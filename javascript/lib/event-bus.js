@@ -13,21 +13,11 @@ PigEvents.prototype = new events.EventEmitter();
 PigEvents.prototype.emit = function emit( name, data, fromNative ) {
   var json;
 
-  if ( typeof name !== 'string' && name.length < 1 ) {
+  if ( typeof name !== 'string' || name.length === 0 ) {
     throw Error( 'An event name must be defined' );
   }
 
-  if ( data ) {
-    try {
-      json = JSON.stringify( data );
-    } catch ( error ) {
-      return this.fail( error );
-    }
-  }
-
-  json = json || '';
-
-  fromNative = ( fromNative === true ) || false;
+  json = ( data ? JSON.stringify( data ) : '' );
 
   if ( !fromNative ) {
     nativeInterface.event( name, json );
