@@ -1,1 +1,1 @@
-module.exports = require( './lib/bridge' );
+module.exports = require( './lib/pig' );

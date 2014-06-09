@@ -7,16 +7,8 @@ var pig = new Pig();
 
 describe( 'Data out', function() {
 
-  beforeEach( function () {
+  beforeEach( function() {
     pig._reset();
-
-    window = {
-      android: {
-        fail: function() {},
-        success: function() {},
-        event: function() {}
-      }
-    };
   } );
 
 
@@ -156,7 +148,7 @@ describe( 'Data out', function() {
 
   } );
 
-  it( 'should error when attempting to call fial and then success', function () {
+  it( 'should error when attempting to call fail and then success', function () {
     var dummyResponse = new Response( 'dummy-key' );
 
     // Setup the first handler

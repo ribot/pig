@@ -7,16 +7,8 @@ var pig = new Pig();
 
 describe( 'Data in', function() {
 
-  beforeEach( function () {
+  beforeEach( function() {
     pig._reset();
-
-    window = {
-      android: {
-        fail: function() {},
-        success: function() {},
-        event: function() {}
-      }
-    };
   } );
 
 

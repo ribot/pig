@@ -4,16 +4,9 @@ var assert = require( 'assert' ),
 var pig = new Pig();
 
 describe( 'Events', function() {
+
   beforeEach( function() {
     pig._reset();
-
-    window = {
-      android: {
-        fail: function() {},
-        success: function() {},
-        event: function() {}
-      }
-    };
   } );
 
 
