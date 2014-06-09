@@ -24,7 +24,7 @@ Response.prototype = {
 
     code = code || '';
 
-    if ( this.key !== -1 ) {
+    if ( this.key !== '' ) {
       nativeInterface.fail( this.key, code, error.name, error.message );
     }
 
@@ -36,19 +36,9 @@ Response.prototype = {
    * Execute native interface's success callback
    */
   success: function success( data ) {
-    var json;
+    var json = ( data ? JSON.stringify( data ) : '' );
 
-    if ( data ) {
-      try {
-        json = JSON.stringify( data );
-      } catch ( error ) {
-        return this.fail( error );
-      }
-    }
-
-    json = json || '';
-
-    if ( this.key !== -1 ) {
+    if ( this.key !== '' ) {
       nativeInterface.success( this.key, json );
     }
 
