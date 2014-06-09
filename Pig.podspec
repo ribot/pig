@@ -72,7 +72,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/ribot/Pig.git", :commit => "be805ed5410cf46f08cea48417c715692cae803c" }
+  s.source       = { :git => "https://github.com/ribot/Pig.git", :commit => "4aee85f6096b8f212d160022476181fff8d9ed15" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
