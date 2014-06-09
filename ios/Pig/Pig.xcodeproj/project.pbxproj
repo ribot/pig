@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		18A2C25D194629B60093E3ED /* pig-ios.js in Sources */ = {isa = PBXBuildFile; fileRef = 18A2C255194629B60093E3ED /* pig-ios.js */; };
+		18A2C25E194629B60093E3ED /* Pig.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A2C257194629B60093E3ED /* Pig.m */; };
+		18A2C25F194629B60093E3ED /* PigCallback.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A2C259194629B60093E3ED /* PigCallback.m */; };
+		18A2C260194629B60093E3ED /* PigWebViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A2C25B194629B60093E3ED /* PigWebViewManager.m */; };
 		9FF989961942045B003DE3A0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FF989951942045B003DE3A0 /* Foundation.framework */; };
 		9FF989A41942045B003DE3A0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FF989A31942045B003DE3A0 /* XCTest.framework */; };
 		9FF989A51942045B003DE3A0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FF989951942045B003DE3A0 /* Foundation.framework */; };
@@ -14,8 +18,6 @@
 		9FF989AA1942045B003DE3A0 /* libPig.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FF989921942045B003DE3A0 /* libPig.a */; };
 		9FF989B01942045B003DE3A0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9FF989AE1942045B003DE3A0 /* InfoPlist.strings */; };
 		9FF989B21942045B003DE3A0 /* PigTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989B11942045B003DE3A0 /* PigTests.m */; };
-		9FF989C01942047D003DE3A0 /* PIGBridgeCallBack.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989BC1942047D003DE3A0 /* PIGBridgeCallBack.m */; };
-		9FF989C11942047D003DE3A0 /* PIGBridgeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FF989BE1942047D003DE3A0 /* PIGBridgeManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		18A2C255194629B60093E3ED /* pig-ios.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "pig-ios.js"; sourceTree = "<group>"; };
+		18A2C256194629B60093E3ED /* Pig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pig.h; sourceTree = "<group>"; };
+		18A2C257194629B60093E3ED /* Pig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pig.m; sourceTree = "<group>"; };
+		18A2C258194629B60093E3ED /* PigCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigCallback.h; sourceTree = "<group>"; };
+		18A2C259194629B60093E3ED /* PigCallback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigCallback.m; sourceTree = "<group>"; };
+		18A2C25A194629B60093E3ED /* PigWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigWebViewManager.h; sourceTree = "<group>"; };
+		18A2C25B194629B60093E3ED /* PigWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigWebViewManager.m; sourceTree = "<group>"; };
+		18A2C25C194629B60093E3ED /* PigWebViewManagerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigWebViewManagerDelegate.h; sourceTree = "<group>"; };
 		9FF989921942045B003DE3A0 /* libPig.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPig.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FF989951942045B003DE3A0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		9FF989991942045B003DE3A0 /* Pig-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Pig-Prefix.pch"; sourceTree = "<group>"; };
@@ -50,11 +60,6 @@
 		9FF989AD1942045B003DE3A0 /* PigTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PigTests-Info.plist"; sourceTree = "<group>"; };
 		9FF989AF1942045B003DE3A0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9FF989B11942045B003DE3A0 /* PigTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PigTests.m; sourceTree = "<group>"; };
-		9FF989BB1942047D003DE3A0 /* PIGBridgeCallBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PIGBridgeCallBack.h; sourceTree = "<group>"; };
-		9FF989BC1942047D003DE3A0 /* PIGBridgeCallBack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PIGBridgeCallBack.m; sourceTree = "<group>"; };
-		9FF989BD1942047D003DE3A0 /* PIGBridgeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PIGBridgeManager.h; sourceTree = "<group>"; };
-		9FF989BE1942047D003DE3A0 /* PIGBridgeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PIGBridgeManager.m; sourceTree = "<group>"; };
-		9FF989BF1942047D003DE3A0 /* PIGBridgeStrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PIGBridgeStrings.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,11 +117,14 @@
 		9FF989971942045B003DE3A0 /* Pig */ = {
 			isa = PBXGroup;
 			children = (
-				9FF989BB1942047D003DE3A0 /* PIGBridgeCallBack.h */,
-				9FF989BC1942047D003DE3A0 /* PIGBridgeCallBack.m */,
-				9FF989BD1942047D003DE3A0 /* PIGBridgeManager.h */,
-				9FF989BE1942047D003DE3A0 /* PIGBridgeManager.m */,
-				9FF989BF1942047D003DE3A0 /* PIGBridgeStrings.h */,
+				18A2C255194629B60093E3ED /* pig-ios.js */,
+				18A2C256194629B60093E3ED /* Pig.h */,
+				18A2C257194629B60093E3ED /* Pig.m */,
+				18A2C258194629B60093E3ED /* PigCallback.h */,
+				18A2C259194629B60093E3ED /* PigCallback.m */,
+				18A2C25A194629B60093E3ED /* PigWebViewManager.h */,
+				18A2C25B194629B60093E3ED /* PigWebViewManager.m */,
+				18A2C25C194629B60093E3ED /* PigWebViewManagerDelegate.h */,
 				9FF989981942045B003DE3A0 /* Supporting Files */,
 			);
 			path = Pig;
@@ -229,8 +237,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9FF989C01942047D003DE3A0 /* PIGBridgeCallBack.m in Sources */,
-				9FF989C11942047D003DE3A0 /* PIGBridgeManager.m in Sources */,
+				18A2C25E194629B60093E3ED /* Pig.m in Sources */,
+				18A2C25F194629B60093E3ED /* PigCallback.m in Sources */,
+				18A2C260194629B60093E3ED /* PigWebViewManager.m in Sources */,
+				18A2C25D194629B60093E3ED /* pig-ios.js in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,6 +421,7 @@
 				9FF989B71942045B003DE3A0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9FF989B81942045B003DE3A0 /* Build configuration list for PBXNativeTarget "PigTests" */ = {
 			isa = XCConfigurationList;
@@ -419,6 +430,7 @@
 				9FF989BA1942045B003DE3A0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
