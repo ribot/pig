@@ -13,7 +13,7 @@ var Pig = function Pig() {
 Pig.prototype = new PigEvents();
 
 /**
- * Register handler
+ * Register a handler
  */
 Pig.prototype.register = function register( path, handler ) {
 
@@ -26,7 +26,7 @@ Pig.prototype.register = function register( path, handler ) {
 };
 
 /**
- * Execute handler
+ * Execute a handler
  */
 Pig.prototype._execute = function _execute( key, path, data ) {
   var response = ( key instanceof Response ? key : new Response( key ) );

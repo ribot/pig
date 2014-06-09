@@ -9,14 +9,6 @@ describe( 'Handler', function() {
 
   beforeEach( function() {
     pig._reset();
-
-    window = {
-      android: {
-        fail: function() {},
-        success: function() {},
-        event: function() {}
-      }
-    };
   } );
 
 

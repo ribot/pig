@@ -5,14 +5,14 @@ var nativeInterface = require( './native-interface' );
  * Response constructor
  */
 var Response = function Response( key ) {
-  this.key = key;
+  this.key = key.toString();
   return this;
 };
 
 Response.prototype = {
 
   /**
-   * Native party failure callback
+   * Execute native interface's failure callback
    */
   fail: function fail( error, code ) {
 
@@ -33,10 +33,20 @@ Response.prototype = {
   },
 
   /**
-   * Native party success callback
+   * Execute native interface's success callback
    */
   success: function success( data ) {
-    var json = ( data ? JSON.stringify( data ) : '' );
+    var json;
+
+    if ( data ) {
+      try {
+        json = JSON.stringify( data );
+      } catch ( error ) {
+        return this.fail( error );
+      }
+    }
+
+    json = json || '';
 
     if ( this.key !== -1 ) {
       nativeInterface.success( this.key, json );
@@ -49,8 +59,8 @@ Response.prototype = {
 };
 
 /**
- * Replaces the success and fail function in this response object with a
- * function which throws and Error.
+ * Replaces the success and fail callbacks in a response instance with a
+ * function that throws an Error
  */
 function _preventRecurrence() {
 

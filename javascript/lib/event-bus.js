@@ -11,11 +11,21 @@ PigEvents.prototype = new events.EventEmitter();
  * Emit override
  */
 PigEvents.prototype.emit = function emit( name, data, fromNative ) {
-  var json = ( data ? JSON.stringify( data ) : '' );
+  var json;
 
-  if ( typeof name !== 'string' ) {
+  if ( typeof name !== 'string' && name.length < 1 ) {
     throw Error( 'An event name must be defined' );
   }
+
+  if ( data ) {
+    try {
+      json = JSON.stringify( data );
+    } catch ( error ) {
+      return this.fail( error );
+    }
+  }
+
+  json = json || '';
 
   fromNative = ( fromNative === true ) || false;
 
