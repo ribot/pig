@@ -10,7 +10,6 @@
 
 @interface PIGBridgeCallBack ()
 
-@property (nonatomic) NSNumber * callBackID;
 @property (nonatomic, copy) void (^successBlock)(NSString *data);
 @property (nonatomic, copy) void (^failureBlock)(NSString *code, NSString *name, NSString *message);
 
@@ -20,31 +19,25 @@
 
 #pragma mark - Constructor
 
-- (instancetype)initWithCallBackID:(NSNumber *)callBackID success:(void (^)(NSString *data))success failure:(void (^)(NSString *code, NSString *name, NSString *message))failure
+- (instancetype)initWithSuccess:(void (^)(NSString *data))success failure:(void (^)(NSString *code, NSString *name, NSString *message))failure
 {
     self = [super init];
     if (self)
     {
-        _callBackID   = callBackID;
         _successBlock = success;
         _failureBlock = failure;
-        
+
     }
     return self;
 }
 
-#pragma mark - Getters
-
-- (NSNumber *)callBackID
+- (void)dealloc
 {
-//    TODO: return a DEFAULT_CALLBACKID which will flag that there is an error getting the float
-//    if (!_callBackID) {
-//        return DEFAULT_CALLBACKID;
-//    }else{
-//        return _scale;
-//    }
-    return _callBackID;
+    _successBlock = nil;
+    _failureBlock = nil;
 }
+
+#pragma mark - Getters
 
 - (void (^)(NSString *data))successBlock
 {
@@ -66,12 +59,6 @@
 //        };
 //    }
     return _failureBlock;
-}
-
-- (void)dealloc
-{
-    _successBlock = nil;
-    _failureBlock = nil;
 }
 
 @end

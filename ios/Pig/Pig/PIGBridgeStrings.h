@@ -8,16 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
-/// JavaScript file name
-#define kJSFileName @"bundle"
-#define kJSFiletype @"js"
-
 /// JavaScript Objects
 #define kJSWindowObject @"window"
 #define kJSPigObject    @"pig"
 #define kJSInvokeMethod @"_execute"
 
+/// Console
+#define kConsole @"console"
+#define kConsoleLog @"log"
+
 /// Call backs
-#define kObjCSuccessBlock @"successiOS"
-#define kObjCFailureBlock @"failureiOS"
-#define kObjCConsoleBlock @"consolelog"
+#define kIOS @"ios"
+#define kIOSSuccess @"success"
+#define kIOSFail @"fail"

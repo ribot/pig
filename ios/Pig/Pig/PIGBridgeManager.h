@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <JavaScriptCore/JavaScriptCore.h>
 
-@interface PIGBridgeManager : NSObject
+@interface PIGBridgeManager : NSObject <UIWebViewDelegate>
+
+- (instancetype) initWithWebView:(UIWebView *) webview;
 
 /// Executes a given function in Javascript.
 /// @param path
@@ -17,8 +19,5 @@
 /// @param success
 /// @param failure
 - (void)execute:(NSString *)path data:(NSString *)data  success:(void (^)(NSString *data))success failure:(void (^)(NSString *code, NSString *name, NSString *message))failure;
-
-/// Shares the PIGBridgeManager
-+ (instancetype)sharedPIGBridgeManager;
 
 @end

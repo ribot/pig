@@ -14,15 +14,12 @@
 /// @param callBackID
 /// @param success
 /// @param failure
-- (instancetype)initWithCallBackID:(NSNumber *)callBackID success:(void (^)(NSString *data))success failure:(void (^)(NSString *code, NSString *name, NSString *message))failure;
-
-/// Getter method for callBackID
-- (NSNumber *)callBackID;
+- (instancetype)initWithSuccess:(void (^)(NSString *data))success failure:(void (^)(NSString *code, NSString *name, NSString *message))failure;
 
 /// Getter method for successBlock
 - (void (^)(NSString *data))successBlock;
 
-/// Getter method for failureBlock 
+/// Getter method for failureBlock
 - (void (^)(NSString *code, NSString *name, NSString *message))failureBlock;
 
 @end
