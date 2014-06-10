@@ -48,7 +48,6 @@
 		18A2C259194629B60093E3ED /* PigCallback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigCallback.m; sourceTree = "<group>"; };
 		18A2C25A194629B60093E3ED /* PigWebViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigWebViewManager.h; sourceTree = "<group>"; };
 		18A2C25B194629B60093E3ED /* PigWebViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PigWebViewManager.m; sourceTree = "<group>"; };
-		18A2C25C194629B60093E3ED /* PigWebViewManagerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PigWebViewManagerDelegate.h; sourceTree = "<group>"; };
 		18CDD0AC1946F751007DB0CE /* bridge.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = bridge.js; sourceTree = "<group>"; };
 		18CDD0AE1946F93F007DB0CE /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		9FF989921942045B003DE3A0 /* libPig.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPig.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -123,7 +122,6 @@
 				18A2C259194629B60093E3ED /* PigCallback.m */,
 				18A2C25A194629B60093E3ED /* PigWebViewManager.h */,
 				18A2C25B194629B60093E3ED /* PigWebViewManager.m */,
-				18A2C25C194629B60093E3ED /* PigWebViewManagerDelegate.h */,
 				9FF989981942045B003DE3A0 /* Supporting Files */,
 			);
 			path = Pig;

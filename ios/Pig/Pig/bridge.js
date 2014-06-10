@@ -1,25 +1,25 @@
 (function() {
-  var requestQueue = [],
+  var responseQueue = [],
       callbackIframe;
 
   // External methods
   window.ios = {
     // pig-javascript interface methods
 
-    success: function( callbackId, data ) {
-      requestQueue.push( {
+    success: function( key, data ) {
+      responseQueue.push( {
         method: 'success',
-        callbackId: callbackId,
+        key: key,
         data: data
       } );
 
       notifyNewCallback();
     },
 
-    fail: function( callbackId, code, name, message ) {
-      requestQueue.push( {
+    fail: function( key, code, name, message ) {
+      responseQueue.push( {
         method: 'fail',
-        callbackId: callbackId,
+        key: key,
         code: code,
         name: name,
         message: message
@@ -31,8 +31,8 @@
     // Internal pig-ios methods
 
     _getCallbackQueue: function() {
-      var queueString = JSON.stringify( requestQueue );
-      requestQueue = [];
+      var queueString = JSON.stringify( responseQueue );
+      responseQueue = [];
 
       return queueString;
     }

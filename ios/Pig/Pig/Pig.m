@@ -7,8 +7,6 @@
 //
 
 #import "Pig.h"
-#import "PigWebViewManager.h"
-#import "PigCallback.h"
 
 @interface Pig ()
 

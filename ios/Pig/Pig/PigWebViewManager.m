@@ -80,7 +80,7 @@
 - (void)handleCallback:(NSDictionary *)callback {
     // TODO: Check we have a valid callback object
     // TODO: Check everything is valid at each stage
-    NSString *key = callback[@"callbackId"];
+    NSString *key = callback[@"key"];
     NSString *method = callback[@"method"];
 
     if ([method isEqualToString:@"success"]) {
@@ -92,6 +92,7 @@
         NSString *name = callback[@"name"];
         NSString *message = callback[@"message"];
 
+        // TODO: Change name
         [_delegate failForKey:key withCode:code name:name message:message];
     }
 }
