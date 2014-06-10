@@ -10,6 +10,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebSettings;
 
 import java.text.MessageFormat;
 import java.util.Queue;
@@ -31,17 +32,19 @@ class WebViewWrapper {
         mWebView = new WebView(context);
         mMainHandler = new Handler(Looper.getMainLooper());
 
-        initWebView();
+        initWebView(context);
     }
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
-    private void initWebView() {
+    private void initWebView(Context context) {
+        WebSettings settings = mWebView.getSettings();
+
         // Enable JavaScript
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        // Enable DOM storage API
-        mWebView.getSettings().setDomStorageEnabled(true);
-        // Enable Database API
-        mWebView.getSettings().setDatabaseEnabled(true);
+        settings.setJavaScriptEnabled(true);
+        // Enable data storage
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setDatabasePath(context.getFilesDir().getAbsolutePath());
 
         // Set the web view client to receive callbacks
         mWebView.setWebViewClient(new WebViewClient() {
