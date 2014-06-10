@@ -1,7 +1,6 @@
-var _global = ( typeof window != 'undefined' ? window : undefined ) || global || {},
-    noop = function noop () {};
+var noop = function noop () {};
 
-var nativeInterface = _global.android || _global.ios || {
+var nativeInterface = {
 
   /**
    * Invokes `event` in native code
@@ -9,7 +8,9 @@ var nativeInterface = _global.android || _global.ios || {
    * @param {String} callback id
    * @param {String} json data
    */
-  event: noop,
+  event: function event( name, data ) {
+    getNativeInterface().event( name, data );
+  },
 
   /**
    * Invokes `fail` in native code
@@ -19,7 +20,9 @@ var nativeInterface = _global.android || _global.ios || {
    * @param {String} error name
    * @param {String} error message
    */
-  fail: noop,
+  fail: function fail( callbackId, code, name, message ) {
+    getNativeInterface().fail( callbackId, code, name, message );
+  },
 
   /**
    * Invokes `success` in native code
@@ -27,9 +30,29 @@ var nativeInterface = _global.android || _global.ios || {
    * @param {String} event name
    * @param {String} json data
    */
-  success: noop
+  success: function success( callbackId, data ) {
+    getNativeInterface().success( callbackId, data );
+  }
 
 };
+
+var getNativeInterface = function() {
+  if ( typeof window != 'undefined' ) {
+    if ( window.android ) {
+      return window.android;
+
+    } else if ( window.ios ) {
+      return window.ios;
+    }
+  }
+
+  return {
+    event: noop,
+    fail: noop,
+    success: noop
+  }
+};
+
 
 // Exports
 module.exports = nativeInterface;
