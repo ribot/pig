@@ -8,6 +8,29 @@
 
 #import "PigWebViewManager.h"
 
+#define kPigJsObject @"window.pig"
+#define kPigJsExecute @"_execute"
+
+#define kPigObjcObject @"window.ios"
+#define kPigObjcQueue @"_getCallbackQueue"
+
+#define kPigCallbackKey @"key"
+#define kPigCallbackMethod @"method"
+
+#define kPigCallbackSuccess @"success"
+#define kPigCallbackData @"data"
+
+#define kPigCallbackFail @"fail"
+#define kPigCallbackCode @"code"
+#define kPigCallbackName @"name"
+#define kPigCallbackMessage @"message"
+
+#define kPigUrlProtocol @"pig"
+#define kPigUrlCallback @"callback"
+
+#define kPigBridgeFilename @"bridge"
+#define kPigBridgeExtension @"js"
+
 @interface PigWebViewManager ()
 
 @property (nonatomic, strong) UIWebView *webView;
@@ -43,7 +66,7 @@
 
 - (void)execute:(NSString *) key path:(NSString *)path data:(NSString *)data {
     // TODO: Cleanup inputs
-    NSString *command = [NSString stringWithFormat:@"window.pig._execute(%@, '%@', '%@');", key, path, data];
+    NSString *command = [NSString stringWithFormat:@"%@.%@(%@, '%@', '%@');", kPigJsObject, kPigJsExecute, key, path, data];
     [self dispatchCommand:command];
 }
 
@@ -70,7 +93,8 @@
 #pragma mark - Callbacks
 
 - (void)flushCallbacks {
-    NSString *callbackQueue = [_webView stringByEvaluatingJavaScriptFromString:@"window.ios._getCallbackQueue();"];
+    NSString *command = [NSString stringWithFormat:@"%@.%@()", kPigObjcObject, kPigObjcQueue];
+    NSString *callbackQueue = [_webView stringByEvaluatingJavaScriptFromString:command];
 
     NSArray *callbacks = [NSJSONSerialization JSONObjectWithData:[callbackQueue dataUsingEncoding:NSUTF8StringEncoding]
                                                          options:NSJSONReadingAllowFragments
@@ -86,17 +110,17 @@
 - (void)handleCallback:(NSDictionary *)callback {
     // TODO: Check we have a valid callback object
     // TODO: Check everything is valid at each stage
-    NSString *key = callback[@"key"];
-    NSString *method = callback[@"method"];
+    NSString *key = callback[kPigCallbackKey];
+    NSString *method = callback[kPigCallbackMethod];
 
-    if ([method isEqualToString:@"success"]) {
-        NSString *data = callback[@"data"];
+    if ([method isEqualToString:kPigCallbackSuccess]) {
+        NSString *data = callback[kPigCallbackData];
 
         [_delegate successForKey:key withData:data];
-    } else if ([method isEqualToString:@"fail"]) {
-        NSString *code = callback[@"code"];
-        NSString *name = callback[@"name"];
-        NSString *message = callback[@"message"];
+    } else if ([method isEqualToString:kPigCallbackFail]) {
+        NSString *code = callback[kPigCallbackCode];
+        NSString *name = callback[kPigCallbackName];
+        NSString *message = callback[kPigCallbackMessage];
 
         // TODO: Change name
         [_delegate failForKey:key withCode:code name:name message:message];
@@ -108,9 +132,9 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     NSURL *url = [request URL];
 
-    if ([[url scheme] isEqualToString:@"pig"]) {
+    if ([[url scheme] isEqualToString:kPigUrlProtocol]) {
 
-        if ([[url host] isEqualToString:@"callback"]) {
+        if ([[url host] isEqualToString:kPigUrlCallback]) {
             [self flushCallbacks];
         } else {
             NSLog(@"Pig: WARNING: Received unknown command %@", url);
@@ -124,9 +148,10 @@
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
     // Check for and inject the pig-ios native interface
-    BOOL hasNativeInterface = [[_webView stringByEvaluatingJavaScriptFromString:@"typeof window.ios !== \"undefined\""] boolValue];
+    NSString *command = [NSString stringWithFormat:@"typeof %@ !== \"undefined\"", kPigObjcObject];
+    BOOL hasNativeInterface = [[_webView stringByEvaluatingJavaScriptFromString:command] boolValue];
     if (!hasNativeInterface) {
-        NSString* iosJSPath = [[NSBundle mainBundle] pathForResource:@"bridge" ofType:@"js"];
+        NSString* iosJSPath = [[NSBundle mainBundle] pathForResource:kPigBridgeFilename ofType:kPigBridgeExtension];
         NSString* iosJS = [NSString stringWithContentsOfFile:iosJSPath encoding:NSUTF8StringEncoding error:nil];
 
         [_webView stringByEvaluatingJavaScriptFromString:iosJS];

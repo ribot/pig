@@ -8,6 +8,8 @@
 
 #import "Pig.h"
 
+#define kPigPageExtension @"html"
+
 @interface Pig ()
 
 @property (strong) PigWebViewManager *webViewManager;
@@ -21,7 +23,7 @@
 	if ((self = [super init])) {
         _callbacksArray = [[NSMutableDictionary alloc] init];
         
-        NSString* htmlPath = [[NSBundle mainBundle] pathForResource:page ofType:@"html"];
+        NSString* htmlPath = [[NSBundle mainBundle] pathForResource:page ofType:kPigPageExtension];
         _webViewManager = [[PigWebViewManager alloc] initWithPath:htmlPath];
         _webViewManager.delegate = self;
     }
