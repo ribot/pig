@@ -1,128 +1,30 @@
-#
-#  Be sure to run `pod spec lint Pig.podspec' to ensure this is a
-#  valid spec and to remove all comments including this before submitting the spec.
-#
-#  To learn more about Podspec attributes see http://docs.cocoapods.org/specification.html
-#  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
-#
-
 Pod::Spec.new do |s|
 
-  # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  These will help people to find your library, and whilst it
-  #  can feel like a chore to fill in it's definitely to your advantage. The
-  #  summary should be tweet-length, and the description more in depth.
-  #
-
   s.name         = "Pig"
-  s.version      = "0.0.1"
+  s.version      = "0.2.0"
   s.summary      = "Pig aims to be the bridge in the middle of your native mobile UI and a some shared JavaScript business logic."
+  s.homepage     = "http://github.com/ribot/pig"
 
   s.description  = <<-DESC
-                   A longer description of Pig in Markdown format.
+                   Developing for multiple mobile platforms is both time-consuming and expensive. Writing completely separate
+                   versions in Java and Objective-C in parallel duplicates logic and wastes effort, especially when requirements
+                   change. Writing an application using PhoneGap generally leads to the UI to feeling non-standard and ultimately
+                   to a sub-par user experience.
 
-                   * Think: Why did you write this? What is the focus? What does it do?
-                   * CocoaPods will be using this to generate tags, and improve search results.
-                   * Try to keep it short, snappy and to the point.
-                   * Finally, don't worry about the indent, CocoaPods strips it!
+                   Pig aims to solves these problems by moving the business logic into a shared Javascript codebase. On each platform
+                   (currently Android and iOS), the user interface is implemented in native code, leading the best possible user
+                   experience, while data manipulation and other logic is handled by the shared Javascript.
                    DESC
 
-  s.homepage     = "http://github.com/ribot/Pig"
-  # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
-
-
-  # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Licensing your code is important. See http://choosealicense.com for more info.
-  #  CocoaPods will detect a license file if there is a named LICENSE*
-  #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
-  #
-
-  s.license      = { :type => "MIT", :file => "LICENSE" }
-
-
-  # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Specify the authors of the library, with email addresses. Email addresses
-  #  of the authors are extracted from the SCM log. E.g. $ git log. CocoaPods also
-  #  accepts just a name if you'd rather not provide an email address.
-  #
-  #  Specify a social_media_url where others can refer to, for example a twitter
-  #  profile URL.
-  #
-
-  s.author             = { "Matt" => "matt@ribot.co.uk" }
-  # Or just: s.author    = "Matt"
-  # s.authors            = { "Matt" => "matt@ribot.co.uk" }
-  # s.social_media_url   = "http://twitter.com/Matt"
-
-  # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  If this Pod runs only on iOS or OS X, then specify the platform and
-  #  the deployment target. You can optionally include the target after the platform.
-  #
+  s.license            = { :type => "Apache License, Version 2.0", :file => "LICENSE" }
+  s.author             = { "Matt Oakes" => "matt@ribot.co.uk" }
+  s.social_media_url   = "http://twitter.com/ribot"
 
   s.platform     = :ios, "7.0"
-
-
-  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Specify the location from where the source should be retrieved.
-  #  Supports git, hg, bzr, svn and HTTP.
-  #
-
-  s.source       = { :git => "https://github.com/ribot/Pig.git", :commit => "0674b108823cad4031a3a582a4b3bcb86fea78fb" }
-
-
-  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  CocoaPods is smart about how it includes source code. For source files
-  #  giving a folder will include any h, m, mm, c & cpp files. For header
-  #  files it will include any header in the folder.
-  #  Not including the public_header_files will make all headers public.
-  #
-
+  s.source       = { :git => "https://github.com/ribot/pig.git", :tag => "0.2.0" }
   s.source_files  = "ios/Pig/Pig", "ios/Pig/Pig/**/*.{h,m}"
-
-  # s.public_header_files = "Classes/**/*.h"
-
-
-  # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  A list of resources included with the Pod. These are copied into the
-  #  target bundle with a build phase script. Anything else will be cleaned.
-  #  You can preserve files from being cleaned, please don't preserve
-  #  non-essential files like tests, examples and documentation.
-  #
-
+  s.public_header_files = "ios/Pig/Pig/Pig.h"
   s.resources = "**/bridge.js"
-
-  # s.preserve_paths = "FilesToSave", "MoreFilesToSave"
-
-
-  # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  Link your library with frameworks, or libraries. Libraries do not include
-  #  the lib prefix of their name.
-  #
-
-  # s.framework  = "SomeFramework"
-  # s.frameworks = "SomeFramework", "AnotherFramework"
-
-  # s.library   = "iconv"
-  # s.libraries = "iconv", "xml2"
-
-
-  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
-  #
-  #  If your library depends on compiler flags you can set them in the xcconfig hash
-  #  where they will only apply to your library. If you depend on other Podspecs
-  #  you can include multiple dependencies to ensure it works.
-
   s.requires_arc = true
-
-  # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # s.dependency "JSONKit", "~> 1.4"
 
 end
