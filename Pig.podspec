@@ -23,7 +23,6 @@ Pod::Spec.new do |s|
   s.platform     = :ios, "7.0"
   s.source       = { :git => "https://github.com/ribot/pig.git", :tag => "0.2.0" }
   s.source_files  = "ios/Pig/Pig", "ios/Pig/Pig/**/*.{h,m}"
-  s.public_header_files = "ios/Pig/Pig/Pig.h"
   s.resources = "**/bridge.js"
   s.requires_arc = true
 
