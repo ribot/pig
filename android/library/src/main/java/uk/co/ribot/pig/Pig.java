@@ -21,7 +21,7 @@ public class Pig {
 
     // The static singleton instance of Pig
     private static Pig sPig;
-    private final Map<Double, Message<?>> mSentMessageMap = new ConcurrentHashMap<Double, Message<?>>();
+    private final Map<String, Message<?>> mSentMessageMap = new ConcurrentHashMap<String, Message<?>>();
     private final Map<String, Set<EventListener>> mEventListenerMap = new ConcurrentHashMap<String, Set<EventListener>>();
 
     /**
@@ -214,18 +214,18 @@ public class Pig {
             json = "";
         }
 
-        double randomKey;
+        String randomKey;
         // Add the callback to the map, if we have one
         if (callback != null) {
             // Generate a random key so we can get the callback later
             do {
-                randomKey = Math.round(Math.random() * 40000);
+                randomKey = "" + Math.round(Math.random() * 40000);
             } while (mSentMessageMap.containsKey(randomKey));
 
             Message<R> message = new Message<R>(path, responseType, callback);
             mSentMessageMap.put(randomKey, message);
         } else {
-            randomKey = -1;
+            randomKey = "";
         }
 
         // Send the request through the javascript layer
@@ -236,7 +236,7 @@ public class Pig {
      * Used to receive and process responses from the JS layer via a WebViewWrapper.
      **/
     // TODO: Find a way to avoid unchecked operations
-    void successResponse(Double key, String responseString) {
+    void successResponse(String key, String responseString) {
         Message message = mSentMessageMap.remove(key);
         // Just in case we don't have a message for that key. This shouldn't happen
         if (message == null) return;
@@ -263,7 +263,7 @@ public class Pig {
      * Used to receive and process responses from the JS layer via a WebViewWrapper.
      **/
     // TODO: Find a way to avoid unchecked operations
-    void errorResponse(Double key, String code, String name, String errorMessage) {
+    void errorResponse(String key, String code, String name, String errorMessage) {
         Message message = mSentMessageMap.remove(key);
         // Just in case we don't have a message for that key. This shouldn't happen
         if (message == null) return;
