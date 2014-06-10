@@ -33,6 +33,12 @@
     return self;
 }
 
+- (void)dealloc {
+    _delegate = nil;
+    _webView = nil;
+    _requestQueue = nil;
+}
+
 #pragma mark - Dispatch commands
 
 - (void)execute:(NSString *) key path:(NSString *)path data:(NSString *)data {

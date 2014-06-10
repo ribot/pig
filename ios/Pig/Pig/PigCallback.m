@@ -18,4 +18,9 @@
     return self;
 }
 
+- (void)dealloc {
+    _success = nil;
+    _failure = nil;
+}
+
 @end

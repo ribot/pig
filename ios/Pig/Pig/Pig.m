@@ -29,6 +29,7 @@
 }
 
 - (void)dealloc {
+    _webViewManager = nil;
     _callbacksArray = nil;
 }
 
