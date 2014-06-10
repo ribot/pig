@@ -40,7 +40,7 @@ class WebViewWrapper {
         mWebView.getSettings().setJavaScriptEnabled(true);
         // Enable DOM storage API
         mWebView.getSettings().setDomStorageEnabled(true);
-        // Enable Database API 
+        // Enable Database API
         mWebView.getSettings().setDatabaseEnabled(true);
 
         // Set the web view client to receive callbacks
@@ -84,7 +84,7 @@ class WebViewWrapper {
         mWebView.loadUrl("file:///android_asset/bridge/index.html");
     }
 
-    public <R> void execute(Double key, String path, String jsonData) {
+    public <R> void execute(String key, String path, String jsonData) {
         execute(new Statement<R>(key, path, jsonData));
     }
 
@@ -95,7 +95,7 @@ class WebViewWrapper {
         }
 
         String jsonData = statement.getJsonData().replace("\"", "\\\"");
-        String jsUrl = "javascript:window.pig._execute(" + statement.getKey() + ", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
+        String jsUrl = "javascript:window.pig._execute(\"" + statement.getKey() + "\", \"" + statement.getPath() + "\", \"" + jsonData + "\")";
         mWebView.loadUrl(jsUrl);
     }
 
@@ -117,21 +117,19 @@ class WebViewWrapper {
 
     private class JsToNativeInterface {
         @JavascriptInterface
-        public void success(String key, final String responseString) {
-            final Double doubleKey = Double.parseDouble(key);
+        public void success(final String key, final String responseString) {
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPig.successResponse(doubleKey, responseString);
+                    mPig.successResponse(key, responseString);
                 }
             });
         }
 
         @JavascriptInterface
-        public void fail(String key, final String code, final String name, final String message) {
-            final Double doubleKey = Double.parseDouble(key);
+        public void fail(final String key, final String code, final String name, final String message) {
             mMainHandler.post(new Runnable() {
                 public void run() {
-                    mPig.errorResponse(doubleKey, code, name, message);
+                    mPig.errorResponse(key, code, name, message);
                 }
             });
         }
@@ -147,17 +145,17 @@ class WebViewWrapper {
     }
 
     private class Statement<R> {
-        private Double mKey;
+        private String mKey;
         private String mPath;
         private String mJsonData;
 
-        public Statement(Double key, String path, String data) {
+        public Statement(String key, String path, String data) {
             mKey = key;
             mPath = path;
             mJsonData = data;
         }
 
-        public Double getKey() {
+        public String getKey() {
             return mKey;
         }
 
