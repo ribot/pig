@@ -11,7 +11,7 @@ Your Pig enabled application will be split into at least two different parts:
 - Javascript logic, which is shared between all platforms
 - At least one native (Java, Objective-C) project which implements the user interface
 
-Pig sits in the middle of these two peices of your application ([hence the name](http://en.wikipedia.org/wiki/Keep_Away)) and facilitates the exchange of data between them.
+Pig sits in the middle of these two pieces of your application ([hence the name](http://en.wikipedia.org/wiki/Keep_Away)) and facilitates the exchange of data between them.
 
 ![Pig Architecture](graphics/architecture.png)
 
@@ -27,7 +27,7 @@ It is the responsibility of the project using Pig to define what the handlers fo
 ### Event Bus
 The event bus is used to broadcast small pieces of data to all parts of you application. It is possible for either your native or Javascript code to emit events and these events can be listened for on either side as well. With each event you can also send a piece of JSON data.
 
-Following on from the login example above, the Javascript may wish to emit a `user-logged-in` event when a login request is successful. We could also send the new user's profile information as data with the event. This event would give other parts of the application a chance to learn about the change in state, without having to be called directly. For example, when a login is successful a peice of Javascript might want to run to assosiated some user data the application has with the newly logged in user. At the same time a piece of user interface code might want to listen for the `user-logged-in` event and change to display some user data.
+Following on from the login example above, the Javascript may wish to emit a `user-logged-in` event when a login request is successful. We could also send the new user's profile information as data with the event. This event would give other parts of the application a chance to learn about the change in state, without having to be called directly. For example, when a login is successful a piece of Javascript might want to run to assosiated some user data the application has with the newly logged in user. At the same time a piece of user interface code might want to listen for the `user-logged-in` event and change to display some user data.
 
 ## Using Pig
 ### Javascript
