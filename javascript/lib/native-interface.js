@@ -43,6 +43,9 @@ var getNativeInterface = function() {
 
     } else if ( window.ios ) {
       return window.ios;
+      
+    } else if ( window.testing ) {
+      return window.testing;
     }
   }
 
